@@ -22,7 +22,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
-
+    return res.render('./')
 })
 
 const PORT = process.env.PORT || 8444;
