@@ -86,6 +86,7 @@
 
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
         .form-group label {
@@ -109,6 +110,81 @@
             outline: none;
             border-color: #3a7bd5;
             box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.15);
+        }
+
+        /* Error state styling */
+        .form-group.error input {
+            border-color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.05);
+        }
+
+        .form-group.error input:focus {
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .error-icon {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #e74c3c;
+            display: none;
+        }
+
+        .form-group.error .error-icon {
+            display: block;
+        }
+
+        /* Error notification */
+        .error-notification {
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.3s ease-out forwards;
+            transform: translateY(-20px);
+            opacity: 0;
+            display: none;
+        }
+
+        @keyframes slideDown {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% {transform: translateX(0);}
+            10%, 30%, 50%, 70%, 90% {transform: translateX(-5px);}
+            20%, 40%, 60%, 80% {transform: translateX(5px);}
+        }
+
+        .error-notification.show {
+            display: flex;
+        }
+
+        .error-notification .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 5px;
         }
 
         .login-methods {
@@ -222,6 +298,26 @@
             margin-left: 10px;
         }
 
+        /* Help info section */
+        .help-info {
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            padding: 15px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .help-info a {
+            color: #3a7bd5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .help-link {
+            margin-top: 5px;
+        }
+
         @media (max-width: 500px) {
             .hotspot-container {
                 border-radius: 12px;
@@ -257,6 +353,14 @@
         </div>
         
         <div class="login-form">
+            <div class="error-notification" id="error-notification">
+                <div>
+                    <strong>Authentication Failed</strong>
+                    <p>Please check your access code and try again.</p>
+                </div>
+                <button class="close-btn" onclick="closeError()">×</button>
+            </div>
+            
             <div class="login-methods">
                 <div class="login-method active" onclick="selectMethod(this)">
                     Access Code
@@ -269,12 +373,14 @@
                 </div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" id="access-code-group">
                 <label for="access-code">Access Code</label>
                 <input type="text" id="access-code" placeholder="Enter the access code" required>
+                <div class="error-icon">⚠️</div>
+                <div class="error-message">Invalid access code. Please try again.</div>
             </div>
             
-            <button type="submit" class="connect-btn">Connect to Internet</button>
+            <button type="submit" class="connect-btn" onclick="validateAndConnect()">Connect to Internet</button>
             
             <div class="divider">or</div>
             
@@ -285,6 +391,11 @@
             <div class="terms">
                 By connecting, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. Network usage may be monitored.
             </div>
+        </div>
+        
+        <div class="help-info">
+            <div>Having trouble connecting?</div>
+            <div class="help-link">Contact the front desk or <a href="#">Get Help</a></div>
         </div>
     </div>
 
@@ -297,6 +408,9 @@
             
             // Add active class to selected method
             element.classList.add('active');
+            
+            // Reset any error states
+            resetErrorState();
             
             // Update form based on selected method
             const label = document.querySelector('.form-group label');
@@ -315,6 +429,43 @@
                 input.placeholder = 'Enter your email address';
                 input.type = 'email';
             }
+        }
+        
+        function validateAndConnect() {
+            const input = document.getElementById('access-code');
+            const formGroup = document.getElementById('access-code-group');
+            const errorNotification = document.getElementById('error-notification');
+            
+            // For demonstration purposes, assume "123456" is the correct code
+            if (input.value !== "123456") {
+                // Show error state
+                formGroup.classList.add('error');
+                input.style.animation = 'shake 0.5s';
+                
+                // Show error notification
+                errorNotification.classList.add('show');
+                
+                // Reset animation after it completes
+                setTimeout(() => {
+                    input.style.animation = '';
+                }, 500);
+            } else {
+                // Success - would normally redirect to internet access
+                resetErrorState();
+                alert('Access code verified! Redirecting to internet access...');
+            }
+        }
+        
+        function closeError() {
+            document.getElementById('error-notification').classList.remove('show');
+        }
+        
+        function resetErrorState() {
+            const formGroup = document.getElementById('access-code-group');
+            const errorNotification = document.getElementById('error-notification');
+            
+            formGroup.classList.remove('error');
+            errorNotification.classList.remove('show');
         }
     </script>
 </body>
