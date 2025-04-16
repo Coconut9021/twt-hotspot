@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Hotspot Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .hotspot-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .header-logo {
+            width: 150px;
+            height: 50px;
+            background-color: #3a7bd5;
+            margin: 0 auto 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .network-info {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .network-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .network-status {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .login-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3a7bd5;
+            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.15);
+        }
+
+        .login-methods {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .login-method {
+            flex: 1;
+            padding: 15px 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .login-method:first-child {
+            margin-left: 0;
+        }
+
+        .login-method:last-child {
+            margin-right: 0;
+        }
+
+        .login-method.active {
+            border-color: #3a7bd5;
+            background-color: rgba(58, 123, 213, 0.1);
+        }
+
+        .login-method:hover {
+            background-color: #f0f0f0;
+        }
+
+        .connect-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #3a7bd5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .connect-btn:hover {
+            background-color: #2a6ac5;
+        }
+
+        .terms {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+        }
+
+        .terms a {
+            color: #3a7bd5;
+            text-decoration: none;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        .free-access {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .free-btn {
+            background-color: transparent;
+            border: 1px solid #3a7bd5;
+            color: #3a7bd5;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .free-btn:hover {
+            background-color: rgba(58, 123, 213, 0.1);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #eee;
+        }
+
+        .divider::before {
+            margin-right: 10px;
+        }
+
+        .divider::after {
+            margin-left: 10px;
+        }
+
+        @media (max-width: 500px) {
+            .hotspot-container {
+                border-radius: 12px;
+            }
+            
+            .login-form {
+                padding: 20px;
+            }
+            
+            .login-methods {
+                flex-direction: column;
+            }
+            
+            .login-method {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hotspot-container">
+        <div class="header">
+            <div class="header-logo">WIFI ZONE</div>
+            <h1>Welcome to Our WiFi</h1>
+        </div>
+        
+        <div class="network-info">
+            <div class="network-name">Public_WiFi_Network</div>
+            <div class="network-status">
+                <div class="status-indicator"></div>
+                Connected - Authentication Required
+            </div>
+        </div>
+        
+        <div class="login-form">
+            <div class="login-methods">
+                <div class="login-method active" onclick="selectMethod(this)">
+                    Access Code
+                </div>
+                <div class="login-method" onclick="selectMethod(this)">
+                    Room Number
+                </div>
+                <div class="login-method" onclick="selectMethod(this)">
+                    Email
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="access-code">Access Code</label>
+                <input type="text" id="access-code" placeholder="Enter the access code" required>
+            </div>
+            
+            <button type="submit" class="connect-btn">Connect to Internet</button>
+            
+            <div class="divider">or</div>
+            
+            <div class="free-access">
+                <button class="free-btn">Get 30 Minutes Free Access</button>
+            </div>
+            
+            <div class="terms">
+                By connecting, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. Network usage may be monitored.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectMethod(element) {
+            // Remove active class from all methods
+            document.querySelectorAll('.login-method').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to selected method
+            element.classList.add('active');
+            
+            // Update form based on selected method
+            const label = document.querySelector('.form-group label');
+            const input = document.querySelector('.form-group input');
+            
+            if (element.textContent.trim() === 'Access Code') {
+                label.textContent = 'Access Code';
+                input.placeholder = 'Enter the access code';
+                input.type = 'text';
+            } else if (element.textContent.trim() === 'Room Number') {
+                label.textContent = 'Room Number';
+                input.placeholder = 'Enter your room number';
+                input.type = 'text'; 
+            } else if (element.textContent.trim() === 'Email') {
+                label.textContent = 'Email Address';
+                input.placeholder = 'Enter your email address';
+                input.type = 'email';
+            }
+        }
+    </script>
+</body>
+</html>
