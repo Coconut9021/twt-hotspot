@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-// const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 // const prisma = require('./lib/db');
 // const { mail } = require('./lib/nodemailer');
 // const { generateTwoFactorToken } = require('./lib/token');
