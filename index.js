@@ -1,11 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
-// const prisma = require('./lib/db');
-// const { mail } = require('./lib/nodemailer');
-// const { generateTwoFactorToken } = require('./lib/token');
-// const { getTwoFactorTokenByEmail } = require('./data');
-// const db = require('./db');
 
 const app = express();
 
