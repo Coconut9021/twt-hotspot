@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/', (req, res) => {
+app.post('/', (req, res) => {
     return res.render('./')
 })
 
