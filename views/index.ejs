@@ -3,18 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hotspot Login</title>
+  <title>Masimba Hotspot Login</title>
   <style>
     :root {
-      --primary-color: #8B5A2B;
-      --primary-hover: #6B4423;
-      --secondary-color: #F5F0E6;
-      --text-color: #3C2A1E;
-      --light-text: #7D6B5D;
-      --error-color: #B33A3A;
-      --success-color: #5A8B2B;
-      --background-color: #F8F4EB;
+      --primary-color: #222222;
+      --primary-hover: #000000;
+      --accent-color: #FFDD33;
+      --secondary-color: #F5F5F5;
+      --text-color: #222222;
+      --light-text: #555555;
+      --error-color: #E63946;
+      --success-color: #2A9D8F;
+      --background-color: #F8F8F8;
       --form-bg: #FFFFFF;
+      --border-color: #E0E0E0;
     }
     
     * {
@@ -38,15 +40,28 @@
       max-width: 400px;
       background-color: var(--form-bg);
       border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(139, 90, 43, 0.15);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
       overflow: hidden;
     }
     
     .header {
-      background-color: var(--primary-color);
-      color: white;
+      background-color: white;
+      color: var(--primary-color);
       padding: 1.5rem;
       text-align: center;
+      border-bottom: 3px solid var(--accent-color);
+    }
+    
+    .logo-container {
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .logo {
+      width: 180px;
+      height: auto;
+      object-fit: contain;
     }
     
     .header h1 {
@@ -56,12 +71,13 @@
     
     .header p {
       font-size: 0.9rem;
-      opacity: 0.9;
+      color: var(--text-color);
     }
     
     .wifi-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
     }
     
     .form-container {
@@ -83,7 +99,7 @@
     .form-input {
       width: 100%;
       padding: 0.8rem 1rem;
-      border: 1px solid #E0D5C5;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 1rem;
       transition: border-color 0.3s;
@@ -91,15 +107,15 @@
     
     .form-input:focus {
       outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(139, 90, 43, 0.2);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(255, 221, 51, 0.2);
     }
     
     .btn {
       width: 100%;
       padding: 0.8rem;
-      background-color: var(--primary-color);
-      color: white;
+      background-color: var(--accent-color);
+      color: var(--primary-color);
       border: none;
       border-radius: 8px;
       font-size: 1rem;
@@ -110,7 +126,7 @@
     }
     
     .btn:hover {
-      background-color: var(--primary-hover);
+      background-color: #FFD500;
     }
     
     .info-text {
@@ -130,16 +146,16 @@
     
     .error {
       display: block;
-      background-color: rgba(179, 58, 58, 0.1);
+      background-color: rgba(230, 57, 70, 0.1);
       color: var(--error-color);
-      border: 1px solid rgba(179, 58, 58, 0.3);
+      border: 1px solid rgba(230, 57, 70, 0.3);
     }
     
     .success {
       display: block;
-      background-color: rgba(90, 139, 43, 0.1);
+      background-color: rgba(42, 157, 143, 0.1);
       color: var(--success-color);
-      border: 1px solid rgba(90, 139, 43, 0.3);
+      border: 1px solid rgba(42, 157, 143, 0.3);
     }
     
     .footer {
@@ -161,12 +177,12 @@
     .signal-bar {
       height: 12px;
       width: 6px;
-      background-color: rgba(255, 255, 255, 0.4);
+      background-color: rgba(0, 0, 0, 0.15);
       border-radius: 1px;
     }
     
     .active {
-      background-color: white;
+      background-color: var(--accent-color);
     }
     
     /* Responsive adjustments */
@@ -192,16 +208,19 @@
 <body>
   <div class="container">
     <div class="header">
+      <div class="logo-container">
+        <!-- Using a placeholder image with the same dimensions as the Masimba logo -->
+        <img src="logo.png" alt="Masimba Logo" class="logo" style="background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMTAwIj4KPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNTAiIGZpbGw9IndoaXRlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjAiLz4KPHBhdGggZD0iTTUwLDAgQzc3LjYsMCAxMDAsMjIuNCAxMDAsNTAgQzEwMCw3Ny42IDc3LjYsMTAwIDUwLDEwMCBDMjIuNCwxMDAgMCw3Ny42IDAsNTAgQzAsMjIuNCAyMi40LDAgNTAsMCB6IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGZpbGw9IndoaXRlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjAiLz4KPHBhdGggZD0iTTUwLDAgQzc3LjYsMCAxMDAsODAgMTAwLDUwIEwwLDUwIEw1MCwwIHoiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI0ZGREQzMyIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIwIi8+CjxwYXRoIGQ9Ik01MCwxMDAgQzc3LjYsMTAwIDEwMCwyMCAxMDAsNTAgTDAsNTAgTDUwLDEwMCB6IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGZpbGw9IiMyMjIyMjIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMCIvPgo8dGV4dCB4PSIxMTAiIHk9IjY1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNDAiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMjIyMjIyIj5hc2ltYmE8L3RleHQ+Cjwvc3ZnPg==') no-repeat center; background-size: contain;">
+      </div>
+      <p>Connect to our secure WiFi network</p>
       <div class="wifi-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
           <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
           <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
           <line x1="12" y1="20" x2="12" y2="20"></line>
         </svg>
       </div>
-      <h1>WiFi Hotspot Login</h1>
-      <p>Connect to the internet securely</p>
       <div class="network-strength">
         <div class="signal-bar active"></div>
         <div class="signal-bar active"></div>
@@ -226,11 +245,41 @@
     </div>
     
     <div class="footer">
-      Need help? Contact the network administrator
+      Need help? Contact the Masimba network administrator
     </div>
   </div>
   
   <script>
+    // Create and embed the original Masimba logo as a background image
+    window.addEventListener('DOMContentLoaded', function() {
+      // Create a canvas to draw the logo
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 80;
+      const ctx = canvas.getContext('2d');
+      
+      // Draw yellow semi-circle at the top
+      ctx.beginPath();
+      ctx.arc(40, 40, 40, Math.PI, 0, false);
+      ctx.fillStyle = '#FFDD33';
+      ctx.fill();
+      
+      // Draw black semi-circle at the bottom
+      ctx.beginPath();
+      ctx.arc(40, 40, 40, 0, Math.PI, false);
+      ctx.fillStyle = '#222222';
+      ctx.fill();
+      
+      // Add "asimba" text
+      ctx.font = 'bold 32px Arial';
+      ctx.fillStyle = '#222222';
+      ctx.fillText('asimba', 85, 52);
+      
+      // Replace the placeholder with this image
+      const logoImg = document.querySelector('.logo');
+      logoImg.src = canvas.toDataURL();
+    });
+    
     // Form submission handler
     document.getElementById('login-form').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -260,7 +309,7 @@
       
       setTimeout(() => {
         // For demo purposes, we'll show a success message
-        statusMessage.textContent = 'Successfully connected to the network!';
+        statusMessage.textContent = 'Successfully connected to the Masimba network!';
         statusMessage.className = 'status-message success';
         loginBtn.textContent = 'Connected';
         
