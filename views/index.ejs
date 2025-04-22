@@ -1,472 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi Hotspot Login</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .hotspot-container {
-            width: 100%;
-            max-width: 450px;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-
-        .header-logo {
-            width: 150px;
-            height: 50px;
-            background-color: #3a7bd5;
-            margin: 0 auto 15px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        .network-info {
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-
-        .network-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .network-status {
-            font-size: 14px;
-            color: #666;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            background-color: #4CAF50;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .login-form {
-            padding: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #3a7bd5;
-            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.15);
-        }
-
-        /* Error state styling */
-        .form-group.error input {
-            border-color: #e74c3c;
-            background-color: rgba(231, 76, 60, 0.05);
-        }
-
-        .form-group.error input:focus {
-            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
-        }
-
-        .error-message {
-            color: #e74c3c;
-            font-size: 13px;
-            margin-top: 8px;
-            display: none;
-        }
-
-        .form-group.error .error-message {
-            display: block;
-        }
-
-        .error-icon {
-            position: absolute;
-            right: 15px;
-            top: 42px;
-            color: #e74c3c;
-            display: none;
-        }
-
-        .form-group.error .error-icon {
-            display: block;
-        }
-
-        /* Error notification */
-        .error-notification {
-            background-color: #e74c3c;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            animation: slideDown 0.3s ease-out forwards;
-            transform: translateY(-20px);
-            opacity: 0;
-            display: none;
-        }
-
-        @keyframes slideDown {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes shake {
-            0%, 100% {transform: translateX(0);}
-            10%, 30%, 50%, 70%, 90% {transform: translateX(-5px);}
-            20%, 40%, 60%, 80% {transform: translateX(5px);}
-        }
-
-        .error-notification.show {
-            display: flex;
-        }
-
-        .error-notification .close-btn {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 18px;
-            padding: 0 5px;
-        }
-
-        .login-methods {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .login-method {
-            flex: 1;
-            padding: 15px 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #eee;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 5px;
-        }
-
-        .login-method:first-child {
-            margin-left: 0;
-        }
-
-        .login-method:last-child {
-            margin-right: 0;
-        }
-
-        .login-method.active {
-            border-color: #3a7bd5;
-            background-color: rgba(58, 123, 213, 0.1);
-        }
-
-        .login-method:hover {
-            background-color: #f0f0f0;
-        }
-
-        .connect-btn {
-            width: 100%;
-            padding: 16px;
-            background-color: #3a7bd5;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .connect-btn:hover {
-            background-color: #2a6ac5;
-        }
-
-        .terms {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #888;
-            text-align: center;
-        }
-
-        .terms a {
-            color: #3a7bd5;
-            text-decoration: none;
-        }
-
-        .terms a:hover {
-            text-decoration: underline;
-        }
-
-        .free-access {
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .free-btn {
-            background-color: transparent;
-            border: 1px solid #3a7bd5;
-            color: #3a7bd5;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .free-btn:hover {
-            background-color: rgba(58, 123, 213, 0.1);
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            color: #888;
-            font-size: 14px;
-        }
-
-        .divider::before, .divider::after {
-            content: "";
-            flex: 1;
-            border-bottom: 1px solid #eee;
-        }
-
-        .divider::before {
-            margin-right: 10px;
-        }
-
-        .divider::after {
-            margin-left: 10px;
-        }
-
-        /* Help info section */
-        .help-info {
-            background-color: #f8f9fa;
-            border-top: 1px solid #eee;
-            padding: 15px;
-            text-align: center;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .help-info a {
-            color: #3a7bd5;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .help-link {
-            margin-top: 5px;
-        }
-
-        @media (max-width: 500px) {
-            .hotspot-container {
-                border-radius: 12px;
-            }
-            
-            .login-form {
-                padding: 20px;
-            }
-            
-            .login-methods {
-                flex-direction: column;
-            }
-            
-            .login-method {
-                margin: 5px 0;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotspot Login</title>
+  <style>
+    :root {
+      --primary-color: #8B5A2B;
+      --primary-hover: #6B4423;
+      --secondary-color: #F5F0E6;
+      --text-color: #3C2A1E;
+      --light-text: #7D6B5D;
+      --error-color: #B33A3A;
+      --success-color: #5A8B2B;
+      --background-color: #F8F4EB;
+      --form-bg: #FFFFFF;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--background-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background-color: var(--form-bg);
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(139, 90, 43, 0.15);
+      overflow: hidden;
+    }
+    
+    .header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .header p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .wifi-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .form-container {
+      padding: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-color);
+      font-size: 0.9rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid #E0D5C5;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(139, 90, 43, 0.2);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 0.5rem;
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .info-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--light-text);
+      margin-top: 1.5rem;
+    }
+    
+    .status-message {
+      padding: 0.7rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+    
+    .error {
+      display: block;
+      background-color: rgba(179, 58, 58, 0.1);
+      color: var(--error-color);
+      border: 1px solid rgba(179, 58, 58, 0.3);
+    }
+    
+    .success {
+      display: block;
+      background-color: rgba(90, 139, 43, 0.1);
+      color: var(--success-color);
+      border: 1px solid rgba(90, 139, 43, 0.3);
+    }
+    
+    .footer {
+      padding: 1rem;
+      text-align: center;
+      background-color: var(--secondary-color);
+      font-size: 0.85rem;
+      color: var(--light-text);
+    }
+    
+    .network-strength {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .signal-bar {
+      height: 12px;
+      width: 6px;
+      background-color: rgba(255, 255, 255, 0.4);
+      border-radius: 1px;
+    }
+    
+    .active {
+      background-color: white;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .container {
+        border-radius: 8px;
+      }
+      
+      .header {
+        padding: 1.2rem;
+      }
+      
+      .form-container {
+        padding: 1.2rem;
+      }
+      
+      .btn {
+        padding: 0.7rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="hotspot-container">
-        <div class="header">
-            <div class="header-logo">WIFI ZONE</div>
-            <h1>Welcome to Our WiFi</h1>
-        </div>
-        
-        <div class="network-info">
-            <div class="network-name">Public_WiFi_Network</div>
-            <div class="network-status">
-                <div class="status-indicator"></div>
-                Connected - Authentication Required
-            </div>
-        </div>
-        
-        <div class="login-form">
-            <div class="error-notification" id="error-notification">
-                <div>
-                    <strong>Authentication Failed</strong>
-                    <p>Please check your access code and try again.</p>
-                </div>
-                <button class="close-btn" onclick="closeError()">×</button>
-            </div>
-            
-            <div class="login-methods">
-                <div class="login-method active" onclick="selectMethod(this)">
-                    Access Code
-                </div>
-                <div class="login-method" onclick="selectMethod(this)">
-                    Room Number
-                </div>
-                <div class="login-method" onclick="selectMethod(this)">
-                    Email
-                </div>
-            </div>
-            
-            <div class="form-group" id="access-code-group">
-                <label for="access-code">Access Code</label>
-                <input type="text" id="access-code" placeholder="Enter the access code" required>
-                <div class="error-icon">⚠️</div>
-                <div class="error-message">Invalid access code. Please try again.</div>
-            </div>
-            
-            <button type="submit" class="connect-btn" onclick="validateAndConnect()">Connect to Internet</button>
-            
-            <div class="divider">or</div>
-            
-            <div class="free-access">
-                <button class="free-btn">Get 30 Minutes Free Access</button>
-            </div>
-            
-            <div class="terms">
-                By connecting, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. Network usage may be monitored.
-            </div>
-        </div>
-        
-        <div class="help-info">
-            <div>Having trouble connecting?</div>
-            <div class="help-link">Contact the front desk or <a href="#">Get Help</a></div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <div class="wifi-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+          <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+          <line x1="12" y1="20" x2="12" y2="20"></line>
+        </svg>
+      </div>
+      <h1>WiFi Hotspot Login</h1>
+      <p>Connect to the internet securely</p>
+      <div class="network-strength">
+        <div class="signal-bar active"></div>
+        <div class="signal-bar active"></div>
+        <div class="signal-bar active"></div>
+        <div class="signal-bar"></div>
+      </div>
     </div>
-
-    <script>
-        function selectMethod(element) {
-            // Remove active class from all methods
-            document.querySelectorAll('.login-method').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Add active class to selected method
-            element.classList.add('active');
-            
-            // Reset any error states
-            resetErrorState();
-            
-            // Update form based on selected method
-            const label = document.querySelector('.form-group label');
-            const input = document.querySelector('.form-group input');
-            
-            if (element.textContent.trim() === 'Access Code') {
-                label.textContent = 'Access Code';
-                input.placeholder = 'Enter the access code';
-                input.type = 'text';
-            } else if (element.textContent.trim() === 'Room Number') {
-                label.textContent = 'Room Number';
-                input.placeholder = 'Enter your room number';
-                input.type = 'text'; 
-            } else if (element.textContent.trim() === 'Email') {
-                label.textContent = 'Email Address';
-                input.placeholder = 'Enter your email address';
-                input.type = 'email';
-            }
-        }
+    
+    <div class="form-container">
+      <div class="status-message" id="status-message"></div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="Enter your email address" required>
+        </div>
         
-        function validateAndConnect() {
-            const input = document.getElementById('access-code');
-            const formGroup = document.getElementById('access-code-group');
-            const errorNotification = document.getElementById('error-notification');
-            
-            // For demonstration purposes, assume "123456" is the correct code
-            if (input.value !== "123456") {
-                // Show error state
-                formGroup.classList.add('error');
-                input.style.animation = 'shake 0.5s';
-                
-                // Show error notification
-                errorNotification.classList.add('show');
-                
-                // Reset animation after it completes
-                setTimeout(() => {
-                    input.style.animation = '';
-                }, 500);
-            } else {
-                // Success - would normally redirect to internet access
-                resetErrorState();
-                alert('Access code verified! Redirecting to internet access...');
-            }
-        }
+        <button type="submit" class="btn" id="login-btn">Connect Now</button>
+      </form>
+      
+      <p class="info-text">By connecting, you agree to our Terms of Service and Privacy Policy</p>
+    </div>
+    
+    <div class="footer">
+      Need help? Contact the network administrator
+    </div>
+  </div>
+  
+  <script>
+    // Form submission handler
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const statusMessage = document.getElementById('status-message');
+      const loginBtn = document.getElementById('login-btn');
+      
+      // Simple validation example
+      if (email.trim() === '') {
+        statusMessage.textContent = 'Please enter your email address';
+        statusMessage.className = 'status-message error';
+        return;
+      }
+      
+      // Basic email validation
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        statusMessage.textContent = 'Please enter a valid email address';
+        statusMessage.className = 'status-message error';
+        return;
+      }
+      
+      // Simulate login process
+      loginBtn.textContent = 'Connecting...';
+      loginBtn.disabled = true;
+      
+      setTimeout(() => {
+        // For demo purposes, we'll show a success message
+        statusMessage.textContent = 'Successfully connected to the network!';
+        statusMessage.className = 'status-message success';
+        loginBtn.textContent = 'Connected';
         
-        function closeError() {
-            document.getElementById('error-notification').classList.remove('show');
-        }
-        
-        function resetErrorState() {
-            const formGroup = document.getElementById('access-code-group');
-            const errorNotification = document.getElementById('error-notification');
-            
-            formGroup.classList.remove('error');
-            errorNotification.classList.remove('show');
-        }
-    </script>
+        // In a real application, you would redirect or perform additional actions
+        setTimeout(() => {
+          // Redirect logic would go here
+          loginBtn.textContent = 'Connect Now';
+          loginBtn.disabled = false;
+        }, 2000);
+      }, 1500);
+    });
+  </script>
 </body>
 </html>
