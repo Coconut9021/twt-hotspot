@@ -19,9 +19,9 @@ app.post("/", (req, res) => {
   return res.render("./");
 });
 
-// app.get("*", (req, res) => {
-//   res.redirect("https://google.com");
-// });
+app.get("*", (req, res) => {
+  res.redirect("https://google.com");
+});
 
 const PORT = process.env.PORT || 8444;
 
