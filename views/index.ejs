@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Masimba Hotspot Login</title>
+  <script src="js/jquery.js"></script>
   <style>
     :root {
       --primary-color: #222222;
@@ -224,11 +225,11 @@
     <div class="form-container">
       <div class="status-message" id="status-message"></div>
 
-      <form action="" method="POST" id="login-form">
+      <form action="https://ap1.varsityeights.co.zw/login" method="POST" id="login-form">
         <div class="form-group">
           <label for="email">Email Address</label>
           <input type="email" name="username" id="email" class="form-input" placeholder="Enter your email address" required>
-          <input type="password" hidden name="password">
+          <input type="password" id="password" hidden name="password">
         </div>
 
         <button type="submit" class="btn" id="login-btn">Connect Now</button>
@@ -252,20 +253,26 @@
       const statusMessage = document.getElementById('status-message');
       const loginBtn = document.getElementById('login-btn');
 
+      statusMessage.className = '';
+      statusMessage.textContent = '';
+
       if (email.trim() === '') {
         statusMessage.textContent = 'Please enter your email address';
         statusMessage.className = 'status-message error';
         return;
       }
 
-      if (!email.endsWith('@masimbagroup.com') || !email.endsWith('@geenet.co.zw')) {
+      if (!(email.endsWith('@masimbagroup.com') || email.endsWith('@geenet.co.zw'))) {
         statusMessage.textContent = 'Please enter a valid work email';
         statusMessage.className = 'status-message error';
         return;
       }
 
+      $form.find('input[name="password"]').val(email);
+      console.log(document.getElementById('password').value);
+
       this.submit();
-      
+
     });
   </script>
 </body>
