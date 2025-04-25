@@ -19,7 +19,7 @@ app.post("/", (req, res) => {
   return res.render("./");
 });
 
-app.get('/{*splat}', (req, res) => {
+app.get("/{*splat}", (req, res) => {
   res.redirect("https://google.com");
 });
 
