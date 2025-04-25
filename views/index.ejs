@@ -257,9 +257,8 @@
         return;
       }
 
-      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
-      if (!emailPattern.test(email)) {
-        statusMessage.textContent = 'Please enter a valid email address';
+      if (!email.endsWith('@masimbagroup.com') || !email.endsWith('@geenet.co.zw')) {
+        statusMessage.textContent = 'Please enter a valid work email';
         statusMessage.className = 'status-message error';
         return;
       }
