@@ -17,7 +17,8 @@ app.use(express.static(__dirname + "/public"));
 app.post("/", (req, res) => {
   let hostname = req.body['server-address']
   return res.render("./", {
-    hostname
+    hostname,
+    error: req.body.error
   });
 });
 
