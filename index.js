@@ -15,7 +15,7 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 
 app.post("/", (req, res) => {
-  let hostname = req.body.hostname
+  let hostname = req.body['server-address']
   return res.render("./", {
     hostname
   });
