@@ -15,8 +15,10 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 
 app.post("/", (req, res) => {
-  console.log(req.body);
-  return res.render("./");
+  let hostname = req.body.hostname
+  return res.render("./", {
+    hostname
+  });
 });
 
 app.get("/{*splat}", (req, res) => {
