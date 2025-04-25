@@ -246,8 +246,9 @@
     document.getElementById('login-form').addEventListener('submit', function(e) {
       e.preventDefault();
 
+      const $form = $(this);
+
       const email = document.getElementById('email').value;
-      console.log(email);
       const statusMessage = document.getElementById('status-message');
       const loginBtn = document.getElementById('login-btn');
 
@@ -263,19 +264,8 @@
         return;
       }
 
-      loginBtn.textContent = 'Connecting...';
-      loginBtn.disabled = true;
-
-      setTimeout(() => {
-        statusMessage.textContent = 'Successfully connected to the Masimba network!';
-        statusMessage.className = 'status-message success';
-        loginBtn.textContent = 'Connected';
-
-        setTimeout(() => {
-          loginBtn.textContent = 'Connect Now';
-          loginBtn.disabled = false;
-        }, 2000);
-      }, 1500);
+      this.submit();
+      
     });
   </script>
 </body>
