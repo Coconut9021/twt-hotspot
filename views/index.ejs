@@ -225,6 +225,11 @@
     <div class="form-container">
       <div class="status-message" id="status-message"></div>
 
+      <% if (error === 'RADIUS server is not responding') { %>
+        <div class="status-message error" id="status-message"><%= error %></div>
+      <% } %>
+
+
       <form action="http://<%= hostname %>/login" method="POST" id="login-form">
         <div class="form-group">
           <label for="email">Email Address</label>
@@ -255,12 +260,6 @@
 
       statusMessage.className = '';
       statusMessage.textContent = '';
-
-      if (<%= error %>) {
-        statusMessage.textContent = 'Invalid username or password';
-        statusMessage.className = 'status-message error';
-        return;
-      }
 
       if (email.trim() === '') {
         statusMessage.textContent = 'Please enter your email address';
