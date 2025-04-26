@@ -15,7 +15,7 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 
 app.post("/", (req, res) => {
-  let hostname = req.body['server-address']
+  // let hostname = req.body['server-address']
   console.log(req.body)
   return res.render("./", {
     hostname,
@@ -23,9 +23,9 @@ app.post("/", (req, res) => {
   });
 });
 
-// app.get("/{*splat}", (req, res) => {
-//   res.redirect("https://google.com");
-// });
+app.get("/{*splat}", (req, res) => {
+  res.redirect("https://google.com");
+});
 
 const PORT = process.env.PORT || 8444;
 
