@@ -24,6 +24,7 @@ app.post("/", (req, res) => {
 });
 
 app.get("/{*splat}", (req, res) => {
+  console.log(req.body)
   res.redirect("https://google.com");
 });
 
