@@ -23,9 +23,9 @@ app.post("/", (req, res) => {
   });
 });
 
-app.get("/{*splat}", (req, res) => {
-  res.redirect("https://google.com");
-});
+// app.get("/{*splat}", (req, res) => {
+//   res.redirect("https://google.com");
+// });
 
 const PORT = process.env.PORT || 8444;
 
