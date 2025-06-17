@@ -28,8 +28,8 @@ app.get("/{*splat}", (req, res) => {
   res.redirect("https://google.com");
 });
 
-const PORT = process.env.PORT || 8444;
+const PORT = process.env.PORT || 8445;
 
 app.listen(PORT, () => {
-  console.log("server running at http://localhost:8444");
+  console.log("server running at http://localhost:8445");
 });
