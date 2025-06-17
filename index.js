@@ -14,12 +14,12 @@ app.set("view engine", "ejs");
 
 app.use(express.static(__dirname + "/public"));
 
-app.post("/", (req, res) => {
-  let hostname = req.body['server-address']
-  console.log(req.body)
+app.get("/", (req, res) => {
+  // let hostname = req.body['server-address']
+  // console.log(req.body)
   return res.render("./", {
-    hostname,
-    error: req.body.error
+    // hostname,
+    // error: req.body.error
   });
 });
 

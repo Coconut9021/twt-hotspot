@@ -1,289 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masimba Hotspot Login</title>
-  <script src="js/jquery.js"></script>
-  <script
-  defer
-  data-website-id="6818669f92642935ec98f459"
-  data-domain="byodmasimba.geenet.co.zw"
-  src="https://datafa.st/js/script.js">
-</script>
-  <style>
-    :root {
-      --primary-color: #222222;
-      --primary-hover: #000000;
-      --accent-color: #FFDD33;
-      --secondary-color: #F5F5F5;
-      --text-color: #222222;
-      --light-text: #555555;
-      --error-color: #E63946;
-      --success-color: #2A9D8F;
-      --background-color: #F8F8F8;
-      --form-bg: #FFFFFF;
-      --border-color: #E0E0E0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wi-Fi Access Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-    body {
-      background-color: var(--background-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 1rem;
-    }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .container {
-      width: 100%;
-      max-width: 400px;
-      background-color: var(--form-bg);
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
 
-    .header {
-      background-color: white;
-      color: var(--primary-color);
-      padding: 1.5rem;
-      text-align: center;
-      border-bottom: 3px solid var(--accent-color);
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    .logo-container {
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: center;
-    }
+        .wifi-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
 
-    .header h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
 
-    .header p {
-      font-size: 0.9rem;
-      color: var(--text-color);
-    }
+        .wifi-icon::before {
+            content: '📶';
+            font-size: 24px;
+            filter: grayscale(1) brightness(0) invert(1);
+        }
 
-    .wifi-icon {
-      display: flex;
-      justify-content: center;
-      margin-top: 1rem;
-    }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
 
-    .form-container {
-      padding: 1.5rem;
-    }
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
 
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text-color);
-      font-size: 0.9rem;
-    }
+        label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
 
-    .form-input {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
+        .required {
+            color: #e74c3c;
+        }
 
-    .form-input:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 2px rgba(255, 221, 51, 0.2);
-    }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
 
-    .btn {
-      width: 100%;
-      padding: 0.8rem;
-      background-color: var(--accent-color);
-      color: var(--primary-color);
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      margin-top: 0.5rem;
-    }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
 
-    .btn:hover {
-      background-color: #FFD500;
-    }
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
 
-    .info-text {
-      text-align: center;
-      font-size: 0.85rem;
-      color: var(--light-text);
-      margin-top: 1.5rem;
-    }
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: #667eea;
+        }
 
-    .status-message {
-      padding: 0.7rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-      display: none;
-    }
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-size: 14px;
+            line-height: 1.5;
+            flex: 1;
+        }
 
-    .error {
-      display: block;
-      background-color: rgba(230, 57, 70, 0.1);
-      color: var(--error-color);
-      border: 1px solid rgba(230, 57, 70, 0.3);
-    }
+        .checkbox-group a {
+            color: #667eea;
+            text-decoration: none;
+        }
 
-    .success {
-      display: block;
-      background-color: rgba(42, 157, 143, 0.1);
-      color: var(--success-color);
-      border: 1px solid rgba(42, 157, 143, 0.3);
-    }
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
 
-    .footer {
-      padding: 1rem;
-      text-align: center;
-      background-color: var(--secondary-color);
-      font-size: 0.85rem;
-      color: var(--light-text);
-    }
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    .network-strength {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
 
-    .signal-bar {
-      height: 12px;
-      width: 6px;
-      background-color: rgba(0, 0, 0, 0.15);
-      border-radius: 1px;
-    }
+        .submit-btn:active {
+            transform: translateY(0);
+        }
 
-    .active {
-      background-color: var(--accent-color);
-    }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
 
-    @media (max-width: 480px) {
-      .container {
-        border-radius: 8px;
-      }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
 
-      .header {
-        padding: 1.2rem;
-      }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-      .form-container {
-        padding: 1.2rem;
-      }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
 
-      .btn {
-        padding: 0.7rem;
-      }
-    }
-  </style>
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="logo-container">
-        <img src="logo.png" alt="masimba logo" class="logo">
-      </div>
-      <p>Connect to our secure WiFi network</p>
-      <div class="wifi-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-          <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-          <line x1="12" y1="20" x2="12" y2="20"></line>
-        </svg>
-      </div>
-      <div class="network-strength">
-        <div class="signal-bar active"></div>
-        <div class="signal-bar active"></div>
-        <div class="signal-bar active"></div>
-        <div class="signal-bar"></div>
-      </div>
-    </div>
-
-    <div class="form-container">
-      <div class="status-message" id="status-message"></div>
-
-      <% if (error === 'RADIUS server is not responding') { %>
-        <div class="status-message error" id="status-message">Wrong user email address</div>
-      <% } %>
-
-
-      <form action="http://<%= hostname %>/login" method="POST" id="login-form">
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" name="username" id="email" class="form-input" placeholder="Enter your email address" required>
-          <input type="password" id="password" hidden name="password">
+    <div class="container">
+        <div class="header">
+            <div class="wifi-icon"></div>
+            <h1>Welcome to Our Network</h1>
+            <p class="subtitle">Please complete the form below to access Wi-Fi</p>
         </div>
 
-        <button type="submit" class="btn" id="login-btn">Connect Now</button>
-      </form>
+        <form id="wifiForm" novalidate>
+            <div class="form-group">
+                <label for="fullName">Full Name <span class="required">*</span></label>
+                <input type="text" id="fullName" name="fullName" required>
+                <div class="error" id="fullNameError">Please enter your full name</div>
+            </div>
 
-      <p class="info-text">By connecting, you agree to our Terms of Service and Privacy Policy</p>
+            <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required>
+                <div class="error" id="emailError">Please enter a valid email address</div>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Optional">
+                <div class="error" id="phoneError">Please enter a valid phone number</div>
+            </div>
+
+            <div class="form-group">
+                <label for="company">Company Name</label>
+                <input type="text" id="company" name="company" placeholder="If applicable">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and Wi-Fi usage policy <span class="required">*</span></label>
+            </div>
+            <div class="error" id="termsError">You must agree to the Terms of Service</div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="marketing" name="marketing">
+                <label for="marketing">I would like to receive promotional emails and offers (optional)</label>
+            </div>
+
+            <button type="submit" class="submit-btn">Connect to Wi-Fi</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Connecting to Wi-Fi...</p>
+        </div>
+
+        <div class="success" id="success">
+            <h3>Welcome to our network!</h3>
+            <p>You are now connected to Wi-Fi. Enjoy your browsing experience.</p>
+        </div>
     </div>
 
-    <div class="footer">
-      Need help? Contact the network administrator
-    </div>
-  </div>
-
-  <script>
-    document.getElementById('login-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const $form = $(this);
-
-      const email = document.getElementById('email').value;
-      const statusMessage = document.getElementById('status-message');
-      const loginBtn = document.getElementById('login-btn');
-
-      statusMessage.className = '';
-      statusMessage.textContent = '';
-
-      if (email.trim() === '') {
-        statusMessage.textContent = 'Please enter your email address';
-        statusMessage.className = 'status-message error';
-        return;
-      }
-
-      if (!(email.endsWith('@masimbagroup.com') || email.endsWith('@geenet.co.zw'))) {
-        statusMessage.textContent = 'Please enter a valid work email';
-        statusMessage.className = 'status-message error';
-        return;
-      }
-
-      $form.find('input[name="password"]').val(email);
-
-      this.submit();
-
-    });
-  </script>
+    <script>
+        document.getElementById('wifiForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.error').forEach(error => error.style.display = 'none');
+            
+            // Get form data
+            const formData = {
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                company: document.getElementById('company').value.trim(),
+                terms: document.getElementById('terms').checked,
+                marketing: document.getElementById('marketing').checked
+            };
+            
+            // Validation
+            let isValid = true;
+            
+            if (!formData.fullName) {
+                document.getElementById('fullNameError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!formData.email || !isValidEmail(formData.email)) {
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (formData.phone && !isValidPhone(formData.phone)) {
+                document.getElementById('phoneError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!formData.terms) {
+                document.getElementById('termsError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (isValid) {
+                // Show loading
+                document.getElementById('wifiForm').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                
+                // Simulate network connection process
+                setTimeout(() => {
+                    // Here you would typically send the data to your captive portal backend
+                    console.log('User data submitted:', formData);
+                    
+                    // Show success message
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('success').style.display = 'block';
+                    
+                    // In a real implementation, you would redirect to allow network access
+                    // For example: window.location.href = 'http://captive.portal.success';
+                }, 2000);
+            }
+        });
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function isValidPhone(phone) {
+            const phoneRegex = /^[\+]?[\d\s\-\(\)]{10,}$/;
+            return phoneRegex.test(phone);
+        }
+        
+        function showTerms() {
+            alert('Terms of Service:\n\n• Wi-Fi access is provided for legitimate business purposes only\n• Illegal activities are prohibited\n• Network resources are shared - please use responsibly\n• We may monitor usage for security purposes\n• Access may be revoked at any time\n• Your data will be handled according to our privacy policy');
+        }
+        
+        // Add smooth animations to form inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
 </body>
 </html>
