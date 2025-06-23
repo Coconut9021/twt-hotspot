@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Wi-Fi Access Portal</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="success" id="success">
+            <div class="wifi-icon"></div>
+            <h3>Welcome to our network!</h3>
+            <p>You are now connected to Wi-Fi. Enjoy your browsing experience.</p>
+        </div>
+    </div>
+
+    <script>   
+        document.getElementById('success').style.display = 'block';        // Add smooth animations to form inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
