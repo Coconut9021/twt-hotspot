@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import pool, { database, insertUserData } from './database.js' ;
+import pool, { showDatabase, insertUserData, deleteUser } from './database.js' ;
 const app = express();
 
 app.use(express.static("public"));
@@ -15,9 +15,35 @@ app.get("/", (req, res) => {
 })
 
 app.get("/admin", async (req, res) => {
-  const data = await database();
-  res.render("admin.ejs", { data });
-})
+    try {
+        const data = await showDatabase();
+        res.render("admin.ejs", { data });
+    } catch (error) {
+        console.error('Error loading admin page:', error);
+        res.status(500).send('Error loading admin page');
+    }
+});
+
+app.post('/delete-user', async (req, res) => {
+    try {
+        const { fullName, email } = req.body;
+        
+        if (!fullName || !email) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Name and email are required' 
+            });
+        }
+
+        const result = await deleteUser(fullName, email);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
+    }
+});
 
 app.post("/success", (req, res) => {
   const data = req.body;

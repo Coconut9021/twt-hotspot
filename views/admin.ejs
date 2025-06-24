@@ -18,7 +18,7 @@
             <th>Marketing</th>
             <th></th>
         </tr>
-        <% data.forEach(row => { %>
+        <% data.forEach((row, index) => { %>
             <tr>
                 <td><%= row.fullName %></td>
                 <td><%= row.email %></td>
@@ -38,26 +38,7 @@
                         <div class="dropdown-content">
                             <a href="#">Link 1</a>
                             <a href="#">Link 2</a>
-                            <a data-bs-toggle="modal" data-bs-target="#staticBackdrop">Delete</a>
-                        </div>
-
-                        <!-- Deletion warning modal -->
-                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Are you sure you want to proceed</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <strong>Warning!</strong> You are about to permanently delete <strong><%= row.fullName %></strong>'s data.
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary">Delete user</button>
-                            </div>
-                            </div>
-                        </div>
+                            <a href="#" class="delete-link" data-name="<%= row.fullName %>" data-email="<%= row.email %>">Delete</a>
                         </div>
                     </div>
                 </td>
@@ -65,15 +46,103 @@
         <% }) %> 
     </table>
 
+    <!-- Modal placed outside the table -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Are you sure you want to proceed</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <strong>Warning!</strong> You are about to permanently delete <strong id="userToDelete"></strong>'s data.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete User</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Bootstrap JS  -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    
+    <script> 
+        console.log('Script starting...');
+        
+        let userToDelete = null;
 
-    <!-- Handles the dropdown menu -->
-    <script>
-        // Wait for DOM to be fully loaded
+        // Wait for DOM to load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up event listeners...');
             
-            // Get all elements with class 'menu-btn dropdown'
+            // Handle delete button clicks
+            document.addEventListener('click', function(e) {
+                console.log('Click detected on:', e.target.tagName, e.target.className);
+                
+                if (e.target.classList.contains('delete-link')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Delete link clicked!');
+                    
+                    const fullName = e.target.dataset.name;
+                    const email = e.target.dataset.email;
+                    
+                    console.log('User data:', { fullName, email });
+                    
+                    userToDelete = { fullName, email };
+                    document.getElementById('userToDelete').textContent = fullName;
+                    
+                    // Show modal - using the correct ID
+                    console.log('Attempting to show modal...');
+                    const modalElement = document.getElementById('staticBackdrop');
+                    console.log('Modal element found:', modalElement);
+                    
+                    if (modalElement) {
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+                        console.log('Modal.show() called');
+                    } else {
+                        console.error('Modal element not found!');
+                    }
+                }
+            });
+
+            // Handle confirm delete
+            document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+                console.log('Confirm delete clicked');
+                if (!userToDelete) return;
+                
+                try {
+                    const response = await fetch('/delete-user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(userToDelete)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const modalInstance = bootstrap.Modal.getInstance(document.getElementById('staticBackdrop'));
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                        alert('User deleted successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error deleting user: ' + result.error);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the user.');
+                }
+            });
+            
+            // Handle dropdown menu functionality
             const menuBtns = document.querySelectorAll('.dropdown');
+            console.log('Found dropdowns:', menuBtns.length);
 
             menuBtns.forEach(dropdown => {
                 const btn = dropdown.querySelector('.menu-btn');
@@ -82,6 +151,7 @@
                 if (btn && dropdownContent) {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
+                        console.log('Dropdown menu clicked');
                         
                         // Close all other dropdowns first
                         document.querySelectorAll('.dropdown-content').forEach(content => {
@@ -101,20 +171,25 @@
             });
 
             // Close dropdown when clicking outside
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-                    dropdown.style.display = 'none';
-                });
+            document.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('delete-link')) {
+                    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                    });
+                }
             });
 
             // Prevent dropdown from closing when clicking inside it
             document.querySelectorAll('.dropdown-content').forEach(dropdown => {
                 dropdown.addEventListener('click', function(e) {
-                    e.stopPropagation();
+                    if (!e.target.classList.contains('delete-link')) {
+                        e.stopPropagation();
+                    }
                 });
             });
+            
+            console.log('All event listeners set up successfully');
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </body>
 </html>
