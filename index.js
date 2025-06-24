@@ -14,6 +14,11 @@ app.get("/", (req, res) => {
 
 })
 
+app.get("/admin", async (req, res) => {
+  const data = await database();
+  res.render("admin.ejs", { data });
+})
+
 app.post("/success", (req, res) => {
   const data = req.body;
   insertUserData(data);
@@ -29,3 +34,4 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`server running at http://localhost:${PORT}`);
 });
+
