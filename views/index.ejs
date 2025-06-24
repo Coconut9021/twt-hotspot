@@ -10,7 +10,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="wifi-icon"></div>
+            <div>
+                <img src="/public/logo.png" alt="Tiger Wheel & Tyre logo" loading="lazy" >
+            </div>
             <h1>Welcome to Our Network</h1>
             <p class="subtitle">Please complete the form below to access Wi-Fi</p>
         </div>
@@ -75,8 +77,8 @@
             const formData = {
                 fullName: document.getElementById('fullName').value.trim(),
                 email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                company: document.getElementById('company').value.trim(),
+                phone: document.getElementById('phone').value.trim() || null,
+                company: document.getElementById('company').value.trim() || null,
                 terms: document.getElementById('terms').checked,
                 marketing: document.getElementById('marketing').checked
             };
@@ -102,6 +104,10 @@
             if (!formData.terms) {
                 document.getElementById('termsError').style.display = 'block';
                 isValid = false;
+            }
+
+            if(formData.email == '') {
+                formData.email = null;
             }
             
             if (isValid) { 
