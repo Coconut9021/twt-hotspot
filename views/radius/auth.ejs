@@ -1,0 +1,75 @@
+<%- include('../partials/header', { 
+    title: 'Authentication Records', 
+    currentPage: 'radius-auth',
+    showBreadcrumb: true,
+    breadcrumbs: [
+        { name: 'Home', url: '/' },
+        { name: 'RADIUS', url: '/radius/dashboard' },
+        { name: 'Authentication', url: '/radius/auth' }
+    ]
+}) %>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-key me-2"></i>Authentication Records</h1>
+        <p class="text-muted">User authentication attempts and results</p>
+    </div>
+</div>
+
+<!-- Authentication Records Table -->
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="mb-0">Recent Authentication Attempts</h5>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary btn-sm" onclick="refreshRecords()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Auth Date</th>
+                        <th>Result</th>
+                        <th>Reply</th>
+                    </tr>
+                </thead>
+                <tbody id="auth-records">
+                    <% if (records && records.records) { %>
+                        <% records.records.forEach(record => { %>
+                            <tr>
+                                <td><strong><%= record.username %></strong></td>
+                                <td><%= new Date(record.authdate).toLocaleString() %></td>
+                                <td>
+                                    <span class="badge <%= record.pass === 'Accept' ? 'bg-success' : 'bg-danger' %>">
+                                        <%= record.pass %>
+                                    </span>
+                                </td>
+                                <td><%= record.reply %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="text-center">No authentication records found</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshRecords() {
+    location.reload();
+}
+</script>
+
+<%- include('../partials/footer') %>

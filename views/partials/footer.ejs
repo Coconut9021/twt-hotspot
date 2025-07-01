@@ -1,0 +1,178 @@
+    </div> <!-- End of main container -->
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-wifi me-2"></i>TWT Hotspot</h5>
+                    <p class="mb-0">Network Access Management System</p>
+                    <small class="text-muted">Providing secure and monitored internet access</small>
+                </div>
+                <div class="col-md-3">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-light text-decoration-none">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a></li>
+                        <li><a href="/admin" class="text-light text-decoration-none">
+                            <i class="fas fa-users-cog me-1"></i>Admin Panel
+                        </a></li>
+                        <li><a href="/radius/dashboard" class="text-light text-decoration-none">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>System Status</h6>
+                    <ul class="list-unstyled">
+                        <li>
+                            <i class="fas fa-circle text-success me-2"></i>
+                            <small>Web Server: Online</small>
+                        </li>
+                        <li>
+                            <i class="fas fa-circle text-success me-2"></i>
+                            <small>Database: Connected</small>
+                        </li>
+                        <li>
+                            <i class="fas fa-circle text-warning me-2"></i>
+                            <small>RADIUS: <span id="radius-status">Checking...</span></small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <small>&copy; <%= new Date().getFullYear() %> TWT Hotspot. All rights reserved.</small>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <small>
+                        Version 1.0.0 | 
+                        <i class="fas fa-server me-1"></i>
+                        Uptime: <span id="uptime">Loading...</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="/js/jquery.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/main.js"></script>
+    
+    <% if (typeof additionalJS !== 'undefined') { %>
+        <% additionalJS.forEach(js => { %>
+            <script src="<%= js %>"></script>
+        <% }); %>
+    <% } %>
+
+    <script>
+        // Check system status
+        function checkSystemStatus() {
+            fetch('/api/system-status')
+                .then(response => response.json())
+                .then(data => {
+                    const radiusStatus = document.getElementById('radius-status');
+                    if (radiusStatus) {
+                        radiusStatus.textContent = data.radius ? 'Online' : 'Offline';
+                        radiusStatus.parentElement.querySelector('.fas').className = 
+                            `fas fa-circle ${data.radius ? 'text-success' : 'text-danger'} me-2`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking system status:', error);
+                    const radiusStatus = document.getElementById('radius-status');
+                    if (radiusStatus) {
+                        radiusStatus.textContent = 'Unknown';
+                    }
+                });
+        }
+
+        // Update uptime
+        function updateUptime() {
+            fetch('/api/uptime')
+                .then(response => response.json())
+                .then(data => {
+                    const uptimeElement = document.getElementById('uptime');
+                    if (uptimeElement) {
+                        uptimeElement.textContent = formatUptime(data.uptime);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error getting uptime:', error);
+                });
+        }
+
+        function formatUptime(seconds) {
+            const days = Math.floor(seconds / (24 * 3600));
+            const hours = Math.floor((seconds % (24 * 3600)) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (days > 0) {
+                return `${days}d ${hours}h ${minutes}m`;
+            } else if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            } else {
+                return `${minutes}m`;
+            }
+        }
+
+        // Initialize status checks
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSystemStatus();
+            updateUptime();
+            
+            // Update every 30 seconds
+            setInterval(checkSystemStatus, 30000);
+            setInterval(updateUptime, 60000);
+        });
+
+        // Global error handler for AJAX requests
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+        });
+
+        // Add loading spinner utility
+        window.showLoading = function(element) {
+            if (element) {
+                element.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                element.disabled = true;
+            }
+        };
+
+        window.hideLoading = function(element, originalText) {
+            if (element) {
+                element.innerHTML = originalText || 'Submit';
+                element.disabled = false;
+            }
+        };
+
+        // Add notification utility
+        window.showNotification = function(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 80px; right: 20px; z-index: 1050; min-width: 300px;';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        };
+    </script>
+</body>
+</html>

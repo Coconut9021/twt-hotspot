@@ -1,0 +1,136 @@
+<%- include('../partials/header', { 
+    title: 'User Data - ' + username, 
+    currentPage: 'radius-user',
+    showBreadcrumb: true,
+    breadcrumbs: [
+        { name: 'Home', url: '/' },
+        { name: 'RADIUS', url: '/radius/dashboard' },
+        { name: 'User Data', url: '/radius/user/' + username }
+    ]
+}) %>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-user me-2"></i>User: <%= username %></h1>
+        <p class="text-muted">Detailed information and activity for this user</p>
+    </div>
+</div>
+
+<!-- User Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            Total Sessions
+                        </div>
+                        <div class="h5 mb-0">
+                            <%= userData.stats.total_sessions %>
+                        </div>
+                    </div>
+                    <div class="text-white-50">
+                        <i class="fas fa-calendar fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            Total Time
+                        </div>
+                        <div class="h5 mb-0">
+                            <%= formatDuration(userData.stats.total_time) %>
+                        </div>
+                    </div>
+                    <div class="text-white-50">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            Total Data
+                        </div>
+                        <div class="h5 mb-0">
+                            <%= formatBytes(userData.stats.total_data) %>
+                        </div>
+                    </div>
+                    <div class="text-white-50">
+                        <i class="fas fa-download fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            Last Session
+                        </div>
+                        <div class="h5 mb-0">
+                            <%= userData.stats.last_session ? new Date(userData.stats.last_session).toLocaleDateString() : 'Never' %>
+                        </div>
+                    </div>
+                    <div class="text-white-50">
+                        <i class="fas fa-history fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sessions -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Recent Sessions</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Start Time</th>
+                        <th>Duration</th>
+                        <th>Data Used</th>
+                        <th>NAS IP</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% userData.accountingRecords.forEach(record => { %>
+                        <tr>
+                            <td><%= new Date(record.acctstarttime).toLocaleString() %></td>
+                            <td><%= formatDuration(record.acctsessiontime) %></td>
+                            <td><%= formatBytes((record.acctinputoctets || 0) + (record.acctoutputoctets || 0)) %></td>
+                            <td><%= record.nasipaddress %></td>
+                            <td>
+                                <span class="badge <%= record.acctstoptime ? 'bg-secondary' : 'bg-success' %>">
+                                    <%= record.acctstoptime ? 'Closed' : 'Active' %>
+                                </span>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

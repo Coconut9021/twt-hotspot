@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'TWT Hotspot' %></title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+    <% if (typeof additionalCSS !== 'undefined') { %>
+        <% additionalCSS.forEach(css => { %>
+            <link href="<%= css %>" rel="stylesheet">
+        <% }); %>
+    <% } %>
+    
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            margin: 0 10px;
+        }
+        .navbar-nav .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+        body {
+            padding-top: 70px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-wifi me-2"></i>TWT Hotspot
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>" href="/">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'admin' ? 'active' : '' %>" href="/admin">
+                            <i class="fas fa-users-cog me-1"></i>Admin
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle <%= typeof currentPage !== 'undefined' && currentPage.startsWith('radius') ? 'active' : '' %>" href="#" id="radiusDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-chart-line me-1"></i>RADIUS
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/radius/dashboard">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a></li>
+                            <li><a class="dropdown-item" href="/radius/accounting">
+                                <i class="fas fa-calculator me-2"></i>Accounting
+                            </a></li>
+                            <li><a class="dropdown-item" href="/radius/auth">
+                                <i class="fas fa-key me-2"></i>Authentication
+                            </a></li>
+                            <li><a class="dropdown-item" href="/radius/active">
+                                <i class="fas fa-users me-2"></i>Active Sessions
+                            </a></li>
+                            <li><a class="dropdown-item" href="/radius/usage">
+                                <i class="fas fa-chart-bar me-2"></i>Usage Reports
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <span class="navbar-text">
+                            <i class="fas fa-clock me-1"></i>
+                            <span id="current-time"></span>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container-fluid">
+        <% if (typeof showBreadcrumb !== 'undefined' && showBreadcrumb) { %>
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <% if (typeof breadcrumbs !== 'undefined') { %>
+                        <% breadcrumbs.forEach((crumb, index) => { %>
+                            <% if (index === breadcrumbs.length - 1) { %>
+                                <li class="breadcrumb-item active" aria-current="page"><%= crumb.name %></li>
+                            <% } else { %>
+                                <li class="breadcrumb-item"><a href="<%= crumb.url %>"><%= crumb.name %></a></li>
+                            <% } %>
+                        <% }); %>
+                    <% } %>
+                </ol>
+            </nav>
+        <% } %>
+
+        <% if (typeof alerts !== 'undefined' && alerts.length > 0) { %>
+            <% alerts.forEach(alert => { %>
+                <div class="alert alert-<%= alert.type %> alert-dismissible fade show" role="alert">
+                    <i class="fas fa-<%= alert.type === 'success' ? 'check-circle' : alert.type === 'danger' ? 'exclamation-triangle' : 'info-circle' %> me-2"></i>
+                    <%= alert.message %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% }); %>
+        <% } %>
+
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+        
+        // Update time immediately and then every second
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>

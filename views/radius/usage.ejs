@@ -1,0 +1,125 @@
+<%- include('../partials/header', { 
+    title: 'Usage Reports', 
+    currentPage: 'radius-usage',
+    showBreadcrumb: true,
+    breadcrumbs: [
+        { name: 'Home', url: '/' },
+        { name: 'RADIUS', url: '/radius/dashboard' },
+        { name: 'Usage Reports', url: '/radius/usage' }
+    ]
+}) %>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-chart-bar me-2"></i>Usage Reports</h1>
+        <p class="text-muted">Data usage analytics and reporting</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Report Filters</h5>
+    </div>
+    <div class="card-body">
+        <form id="usage-form" class="row g-3">
+            <div class="col-md-3">
+                <label for="start-date" class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="start-date" name="start_date" value="<%= startDate || '' %>">
+            </div>
+            <div class="col-md-3">
+                <label for="end-date" class="form-label">End Date</label>
+                <input type="date" class="form-control" id="end-date" name="end_date" value="<%= endDate || '' %>">
+            </div>
+            <div class="col-md-3">
+                <label for="username" class="form-label">Username (Optional)</label>
+                <input type="text" class="form-control" id="username" name="username" value="<%= username || '' %>" placeholder="Filter by username">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-chart-bar me-1"></i>Generate Report
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="exportReport()">
+                        <i class="fas fa-download me-1"></i>Export
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Usage Report -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Usage Statistics</h5>
+    </div>
+    <div class="card-body">
+        <% if (usageData && usageData.length > 0) { %>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Sessions</th>
+                            <th>Total Time</th>
+                            <th>Upload</th>
+                            <th>Download</th>
+                            <th>Total Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% usageData.forEach(usage => { %>
+                            <tr>
+                                <td>
+                                    <a href="/radius/user/<%= usage.username %>" class="text-decoration-none">
+                                        <strong><%= usage.username %></strong>
+                                    </a>
+                                </td>
+                                <td><%= usage.sessions %></td>
+                                <td><%= formatDuration(usage.total_time) %></td>
+                                <td class="text-end"><%= formatBytes(usage.input_octets) %></td>
+                                <td class="text-end"><%= formatBytes(usage.output_octets) %></td>
+                                <td class="text-end"><strong><%= formatBytes(usage.total_octets) %></strong></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                <p>No usage data found for the selected criteria.</p>
+                <p>Please adjust your filters and try again.</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+function exportReport() {
+    const form = document.getElementById('usage-form');
+    const formData = new FormData(form);
+    const params = new URLSearchParams(formData);
+    params.append('export', 'csv');
+    
+    window.open(`/radius/usage/export?${params.toString()}`, '_blank');
+}
+
+// Set default date range (last 30 days)
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+    
+    if (!startDateInput.value) {
+        const endDate = new Date();
+        const startDate = new Date(endDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+        
+        startDateInput.value = startDate.toISOString().split('T')[0];
+        endDateInput.value = endDate.toISOString().split('T')[0];
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>

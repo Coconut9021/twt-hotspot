@@ -1,0 +1,448 @@
+<%- include('../partials/header', { 
+    title: 'Accounting Records', 
+    currentPage: 'radius-accounting',
+    showBreadcrumb: true,
+    breadcrumbs: [
+        { name: 'Home', url: '/' },
+        { name: 'RADIUS', url: '/radius/dashboard' },
+        { name: 'Accounting', url: '/radius/accounting' }
+    ]
+}) %>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-calculator me-2"></i>Accounting Records</h1>
+        <p class="text-muted">Session accounting and usage tracking</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h5>
+    </div>
+    <div class="card-body">
+        <form id="filter-form" class="row g-3">
+            <div class="col-md-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+            </div>
+            <div class="col-md-3">
+                <label for="nas-ip" class="form-label">NAS IP</label>
+                <input type="text" class="form-control" id="nas-ip" name="nas_ip" placeholder="Enter NAS IP">
+            </div>
+            <div class="col-md-2">
+                <label for="start-date" class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="start-date" name="start_date">
+            </div>
+            <div class="col-md-2">
+                <label for="end-date" class="form-label">End Date</label>
+                <input type="date" class="form-control" id="end-date" name="end_date">
+            </div>
+            <div class="col-md-2">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">All</option>
+                    <option value="active">Active</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search me-1"></i>Apply Filters
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                    <i class="fas fa-times me-1"></i>Clear
+                </button>
+                <button type="button" class="btn btn-success" onclick="exportData()">
+                    <i class="fas fa-download me-1"></i>Export CSV
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Summary -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="d-flex align-items-center">
+            <span class="text-muted">
+                Showing <strong id="records-showing">0</strong> of <strong id="records-total">0</strong> records
+            </span>
+        </div>
+    </div>
+    <div class="col-md-6 text-end">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="refreshData()">
+                <i class="fas fa-sync"></i> Refresh
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAutoRefresh()">
+                <i class="fas fa-clock"></i> <span id="auto-refresh-text">Auto Refresh: OFF</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Accounting Records Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="accounting-table">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Session ID</th>
+                        <th>Username</th>
+                        <th>NAS IP</th>
+                        <th>Start Time</th>
+                        <th>Stop Time</th>
+                        <th>Duration</th>
+                        <th>Input</th>
+                        <th>Output</th>
+                        <th>IP Address</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="accounting-tbody">
+                    <tr>
+                        <td colspan="11" class="text-center">
+                            <i class="fas fa-spinner fa-spin"></i> Loading records...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Accounting records pagination" class="mt-4">
+    <ul class="pagination justify-content-center" id="pagination">
+        <!-- Pagination will be populated by JavaScript -->
+    </ul>
+</nav>
+
+<!-- Session Details Modal -->
+<div class="modal fade" id="sessionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Session Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="session-details">
+                <!-- Session details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPage = 1;
+let autoRefreshInterval = null;
+let autoRefreshEnabled = false;
+
+// Format bytes function
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Format duration
+function formatDuration(seconds) {
+    if (!seconds) return 'N/A';
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+        return `${hours}h ${minutes}m ${secs}s`;
+    } else if (minutes > 0) {
+        return `${minutes}m ${secs}s`;
+    } else {
+        return `${secs}s`;
+    }
+}
+
+// Format date
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString();
+}
+
+// Load accounting records
+function loadAccountingRecords(page = 1) {
+    const formData = new FormData(document.getElementById('filter-form'));
+    const params = new URLSearchParams(formData);
+    params.append('page', page);
+    
+    fetch(`/radius/accounting?${params.toString()}`)
+        .then(response => response.json())
+        .then(data => {
+            displayAccountingRecords(data.records);
+            updatePagination(data.pagination);
+            updateRecordCount(data.pagination);
+        })
+        .catch(error => {
+            console.error('Error loading accounting records:', error);
+            showNotification('Error loading records', 'danger');
+        });
+}
+
+// Display accounting records
+function displayAccountingRecords(records) {
+    const tbody = document.getElementById('accounting-tbody');
+    
+    if (records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted">No records found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = records.map(record => `
+        <tr>
+            <td><code>${record.acctsessionid}</code></td>
+            <td><strong>${record.username}</strong></td>
+            <td>${record.nasipaddress}</td>
+            <td>${formatDate(record.acctstarttime)}</td>
+            <td>${formatDate(record.acctstoptime)}</td>
+            <td>${formatDuration(record.acctsessiontime)}</td>
+            <td class="text-end">${formatBytes(record.acctinputoctets || 0)}</td>
+            <td class="text-end">${formatBytes(record.acctoutputoctets || 0)}</td>
+            <td>${record.framedipaddress || 'N/A'}</td>
+            <td>
+                <span class="badge ${record.acctstoptime ? 'bg-secondary' : 'bg-success'}">
+                    ${record.acctstoptime ? 'Closed' : 'Active'}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="viewSessionDetails(${record.radacctid})">
+                    <i class="fas fa-eye"></i>
+                </button>
+                ${!record.acctstoptime ? `
+                    <button class="btn btn-sm btn-outline-danger" onclick="terminateSession(${record.radacctid})">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                ` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Update pagination
+function updatePagination(pagination) {
+    const paginationElement = document.getElementById('pagination');
+    const { page, totalPages, total } = pagination;
+    
+    if (totalPages <= 1) {
+        paginationElement.innerHTML = '';
+        return;
+    }
+    
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${page === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="goToPage(${page - 1})">Previous</a>
+        </li>
+    `;
+    
+    // Page numbers
+    const startPage = Math.max(1, page - 2);
+    const endPage = Math.min(totalPages, page + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <li class="page-item ${i === page ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="goToPage(${i})">${i}</a>
+            </li>
+        `;
+    }
+    
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${page === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="goToPage(${page + 1})">Next</a>
+        </li>
+    `;
+    
+    paginationElement.innerHTML = paginationHTML;
+}
+
+// Update record count
+function updateRecordCount(pagination) {
+    const { page, limit, total } = pagination;
+    const start = (page - 1) * limit + 1;
+    const end = Math.min(page * limit, total);
+    
+    document.getElementById('records-showing').textContent = `${start}-${end}`;
+    document.getElementById('records-total').textContent = total;
+}
+
+// Go to page
+function goToPage(page) {
+    currentPage = page;
+    loadAccountingRecords(page);
+}
+
+// View session details
+function viewSessionDetails(sessionId) {
+    fetch(`/radius/api/session/${sessionId}`)
+        .then(response => response.json())
+        .then(session => {
+            displaySessionDetails(session);
+            new bootstrap.Modal(document.getElementById('sessionModal')).show();
+        })
+        .catch(error => {
+            console.error('Error loading session details:', error);
+            showNotification('Error loading session details', 'danger');
+        });
+}
+
+// Display session details
+function displaySessionDetails(session) {
+    const detailsDiv = document.getElementById('session-details');
+    detailsDiv.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Session Information</h6>
+                <table class="table table-sm">
+                    <tr><td><strong>Session ID:</strong></td><td><code>${session.acctsessionid}</code></td></tr>
+                    <tr><td><strong>Unique ID:</strong></td><td><code>${session.acctuniqueid}</code></td></tr>
+                    <tr><td><strong>Username:</strong></td><td>${session.username}</td></tr>
+                    <tr><td><strong>Realm:</strong></td><td>${session.realm || 'N/A'}</td></tr>
+                    <tr><td><strong>Status:</strong></td><td>
+                        <span class="badge ${session.acctstoptime ? 'bg-secondary' : 'bg-success'}">
+                            ${session.acctstoptime ? 'Closed' : 'Active'}
+                        </span>
+                    </td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>Network Information</h6>
+                <table class="table table-sm">
+                    <tr><td><strong>NAS IP:</strong></td><td>${session.nasipaddress}</td></tr>
+                    <tr><td><strong>NAS Port:</strong></td><td>${session.nasportid || 'N/A'}</td></tr>
+                    <tr><td><strong>Framed IP:</strong></td><td>${session.framedipaddress || 'N/A'}</td></tr>
+                    <tr><td><strong>Called Station:</strong></td><td>${session.calledstationid || 'N/A'}</td></tr>
+                    <tr><td><strong>Calling Station:</strong></td><td>${session.callingstationid || 'N/A'}</td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h6>Timing</h6>
+                <table class="table table-sm">
+                    <tr><td><strong>Start Time:</strong></td><td>${formatDate(session.acctstarttime)}</td></tr>
+                    <tr><td><strong>Stop Time:</strong></td><td>${formatDate(session.acctstoptime)}</td></tr>
+                    <tr><td><strong>Duration:</strong></td><td>${formatDuration(session.acctsessiontime)}</td></tr>
+                    <tr><td><strong>Terminate Cause:</strong></td><td>${session.acctterminatecause || 'N/A'}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>Data Usage</h6>
+                <table class="table table-sm">
+                    <tr><td><strong>Input Octets:</strong></td><td class="text-end">${formatBytes(session.acctinputoctets || 0)}</td></tr>
+                    <tr><td><strong>Output Octets:</strong></td><td class="text-end">${formatBytes(session.acctoutputoctets || 0)}</td></tr>
+                    <tr><td><strong>Total:</strong></td><td class="text-end"><strong>${formatBytes((session.acctinputoctets || 0) + (session.acctoutputoctets || 0))}</strong></td></tr>
+                </table>
+            </div>
+        </div>
+    `;
+}
+
+// Terminate session
+function terminateSession(sessionId) {
+    if (confirm('Are you sure you want to terminate this session?')) {
+        fetch('/radius/api/terminate-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ sessionId })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                showNotification('Session terminated successfully', 'success');
+                loadAccountingRecords(currentPage);
+            } else {
+                showNotification('Failed to terminate session', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error terminating session:', error);
+            showNotification('Error terminating session', 'danger');
+        });
+    }
+}
+
+// Clear filters
+function clearFilters() {
+    document.getElementById('filter-form').reset();
+    currentPage = 1;
+    loadAccountingRecords();
+}
+
+// Refresh data
+function refreshData() {
+    loadAccountingRecords(currentPage);
+    showNotification('Data refreshed', 'info');
+}
+
+// Toggle auto refresh
+function toggleAutoRefresh() {
+    const textElement = document.getElementById('auto-refresh-text');
+    
+    if (autoRefreshEnabled) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshEnabled = false;
+        textElement.textContent = 'Auto Refresh: OFF';
+    } else {
+        autoRefreshInterval = setInterval(() => {
+            loadAccountingRecords(currentPage);
+        }, 30000);
+        autoRefreshEnabled = true;
+        textElement.textContent = 'Auto Refresh: ON';
+    }
+}
+
+// Export data
+function exportData() {
+    const formData = new FormData(document.getElementById('filter-form'));
+    const params = new URLSearchParams(formData);
+    params.append('export', 'csv');
+    
+    window.open(`/radius/accounting/export?${params.toString()}`, '_blank');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date range (last 7 days)
+    const endDate = new Date();
+    const startDate = new Date(endDate.getTime() - (7 * 24 * 60 * 60 * 1000));
+    
+    document.getElementById('start-date').value = startDate.toISOString().split('T')[0];
+    document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
+    
+    // Load initial data
+    loadAccountingRecords();
+    
+    // Setup form submission
+    document.getElementById('filter-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        currentPage = 1;
+        loadAccountingRecords();
+    });
+});
+</script>
+
+<%- include('../partials/footer') %>

@@ -5,7 +5,14 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon index.js"
+    "dev": "npx nodemon index.js",
+    "start": "node index.js",
+    "start:service": "node start.js start",
+    "stop:service": "node start.js stop",
+    "restart:service": "node start.js restart",
+    "status:service": "node start.js status",
+    "setup:db": "mysql -u root -p < radius_schema.sql",
+    "logs": "node start.js service logProcessor start"
   },
   "keywords": [],
   "author": "",
@@ -16,8 +23,9 @@
     "prettier": "3.5.3"
   },
   "dependencies": {
+    "body-parser": "^2.2.0",
     "bootstrap": "^5.3.7",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "mysql2": "^3.14.1"
