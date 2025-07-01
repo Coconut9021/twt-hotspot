@@ -246,6 +246,97 @@ export async function terminateSession(sessionId) {
     }
 }
 
+// Get user registration statistics
+export async function getUserRegistrationStats() {
+    try {
+        const [results] = await pool.execute(`
+            SELECT 
+                COUNT(*) as total_registrations,
+                COUNT(CASE WHEN DATE(created_at) = CURDATE() THEN 1 END) as registrations_today,
+                COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) as registrations_7d,
+                COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as registrations_30d,
+                COUNT(CASE WHEN marketing = 1 THEN 1 END) as marketing_opted_in
+            FROM radcheck
+        `);
+        
+        return results[0] || {
+            total_registrations: 0,
+            registrations_today: 0,
+            registrations_7d: 0,
+            registrations_30d: 0,
+            marketing_opted_in: 0
+        };
+    } catch (error) {
+        console.error('Error getting user registration stats:', error);
+        throw error;
+    }
+}
+
+// Get recent user registrations
+export async function getRecentRegistrations(limit = 10) {
+    try {
+        const [records] = await pool.execute(`
+            SELECT 
+                fullName,
+                email,
+                phone,
+                company,
+                terms,
+                marketing,
+                created_at
+            FROM radcheck 
+            ORDER BY created_at DESC 
+            LIMIT ?
+        `, [limit]);
+
+        return records;
+    } catch (error) {
+        console.error('Error getting recent registrations:', error);
+        throw error;
+    }
+}
+
+// Get registration trends (daily registrations for the last 30 days)
+export async function getRegistrationTrends() {
+    try {
+        const [records] = await pool.execute(`
+            SELECT 
+                DATE(created_at) as registration_date,
+                COUNT(*) as count
+            FROM radcheck 
+            WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+            GROUP BY DATE(created_at)
+            ORDER BY registration_date ASC
+        `);
+
+        return records;
+    } catch (error) {
+        console.error('Error getting registration trends:', error);
+        throw error;
+    }
+}
+
+// Get top companies by registration count
+export async function getTopCompanies(limit = 5) {
+    try {
+        const [records] = await pool.execute(`
+            SELECT 
+                company,
+                COUNT(*) as registration_count
+            FROM radcheck 
+            WHERE company IS NOT NULL AND company != '' AND company != 'N/A'
+            GROUP BY company
+            ORDER BY registration_count DESC
+            LIMIT ?
+        `, [limit]);
+
+        return records;
+    } catch (error) {
+        console.error('Error getting top companies:', error);
+        throw error;
+    }
+}
+
 // Format bytes to human readable
 export function formatBytes(bytes) {
     if (bytes === 0) return '0 Bytes';

@@ -99,6 +99,89 @@
     </div>
 </div>
 
+<!-- Registration Stats Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-dark shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                            Total Registrations
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <%= registrationStats ? registrationStats.total_registrations : 0 %>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-secondary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                            Registrations Today
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <%= registrationStats ? registrationStats.registrations_today : 0 %>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-purple shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-purple text-uppercase mb-1">
+                            This Week
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <%= registrationStats ? registrationStats.registrations_7d : 0 %>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-week fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-teal shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-teal text-uppercase mb-1">
+                            Marketing Opt-ins
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <%= registrationStats ? registrationStats.marketing_opted_in : 0 %>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-envelope fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Charts Row -->
 <div class="row mb-4">
     <div class="col-xl-8 col-lg-7">
@@ -159,7 +242,7 @@
 
 <!-- Recent Activity -->
 <div class="row">
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-4 mb-4">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
@@ -195,7 +278,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-4 mb-4">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
@@ -226,6 +309,111 @@
                     <a href="/radius/active" class="btn btn-primary btn-sm">
                         <i class="fas fa-eye me-1"></i>View All
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user-plus me-2"></i>Recent Registrations
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (recentRegistrations && recentRegistrations.length > 0) { %>
+                                <% recentRegistrations.forEach(reg => { %>
+                                    <tr>
+                                        <td>
+                                            <strong><%= reg.fullName %></strong>
+                                            <br><small class="text-muted"><%= reg.email %></small>
+                                        </td>
+                                        <td><%= reg.company || 'N/A' %></td>
+                                        <td>
+                                            <small><%= new Date(reg.created_at).toLocaleDateString() %></small>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No recent registrations</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <a href="/admin" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View All
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Statistics Row -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-building me-2"></i>Top Companies
+                </h6>
+            </div>
+            <div class="card-body">
+                <% if (topCompanies && topCompanies.length > 0) { %>
+                    <% topCompanies.forEach((company, index) => { %>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <span class="badge bg-primary rounded-pill"><%= index + 1 %></span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold"><%= company.company %></div>
+                                <small class="text-muted"><%= company.registration_count %> registrations</small>
+                            </div>
+                            <div class="ms-auto">
+                                <div class="progress" style="width: 100px; height: 8px;">
+                                    <div class="progress-bar company-progress-bar" role="progressbar" 
+                                         data-percentage="<%= Math.round((company.registration_count / topCompanies[0].registration_count) * 100) %>"
+                                         aria-valuenow="<%= Math.round((company.registration_count / topCompanies[0].registration_count) * 100) %>"
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-building fa-2x mb-2"></i>
+                        <p>No company data available</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-line me-2"></i>Registration Trends (30 Days)
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="registrationTrendsChart"></canvas>
                 </div>
             </div>
         </div>
@@ -386,6 +574,51 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Initialize registration trends chart
+    const trendsCtx = document.getElementById('registrationTrendsChart');
+    if (trendsCtx) {
+        const trendsData = JSON.parse('<%- JSON.stringify(JSON.stringify(registrationTrends || [])) %>');
+        const labels = trendsData.map(item => new Date(item.registration_date).toLocaleDateString());
+        const data = trendsData.map(item => item.count);
+        
+        new Chart(trendsCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Daily Registrations',
+                    data: data,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Set progress bar widths
+    document.querySelectorAll('.company-progress-bar').forEach(function(bar) {
+        const percentage = bar.getAttribute('data-percentage');
+        bar.style.width = percentage + '%';
+    });
 
     // Load initial data
     loadDashboardData();

@@ -52,8 +52,18 @@ CREATE TABLE IF NOT EXISTS `radcheck` (
   `attribute` varchar(64) NOT NULL DEFAULT '',
   `op` char(2) NOT NULL DEFAULT '==',
   `value` varchar(253) NOT NULL DEFAULT '',
+  `fullName` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `company` varchar(255) DEFAULT NULL,
+  `terms` tinyint(1) DEFAULT 0,
+  `marketing` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `username` (`username`(32))
+  KEY `username` (`username`(32)),
+  KEY `email` (`email`),
+  KEY `created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Table structure for table 'radgroupcheck'

@@ -5,7 +5,11 @@ import {
     getUserData, 
     getUsageReports, 
     getActiveSessions,
-    getDashboardStats 
+    getDashboardStats,
+    getUserRegistrationStats,
+    getRecentRegistrations,
+    getRegistrationTrends,
+    getTopCompanies
 } from './radius_data.js';
 
 const router = express.Router();
@@ -14,7 +18,18 @@ const router = express.Router();
 router.get('/dashboard', async (req, res) => {
     try {
         const stats = await getDashboardStats();
-        res.render('radius/dashboard', { stats });
+        const registrationStats = await getUserRegistrationStats();
+        const recentRegistrations = await getRecentRegistrations(5);
+        const registrationTrends = await getRegistrationTrends();
+        const topCompanies = await getTopCompanies();
+        
+        res.render('radius/dashboard', { 
+            stats, 
+            registrationStats,
+            recentRegistrations,
+            registrationTrends,
+            topCompanies
+        });
     } catch (error) {
         console.error('Error loading RADIUS dashboard:', error);
         res.status(500).send('Error loading dashboard');
@@ -88,7 +103,8 @@ router.get('/active', async (req, res) => {
 router.get('/api/stats', async (req, res) => {
     try {
         const stats = await getDashboardStats();
-        res.json(stats);
+        const registrationStats = await getUserRegistrationStats();
+        res.json({ ...stats, ...registrationStats });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -98,6 +114,25 @@ router.get('/api/active-sessions', async (req, res) => {
     try {
         const sessions = await getActiveSessions();
         res.json(sessions);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/api/recent-registrations', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const registrations = await getRecentRegistrations(limit);
+        res.json(registrations);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/api/registration-trends', async (req, res) => {
+    try {
+        const trends = await getRegistrationTrends();
+        res.json(trends);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
