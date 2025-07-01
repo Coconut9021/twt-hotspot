@@ -1,5 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import radius from 'radius';
+import dgram from 'dgram';
 import pool, { showDatabase, insertUserData, deleteUser } from './database.js' ;
 const app = express();
 
@@ -51,6 +53,10 @@ app.post("/success", (req, res) => {
   res.render('success.ejs');
 }) 
 
+app.post("/send-radius", (req, res) => { 
+    
+ });
+  
 // app.get("/{*splat}", (req, res) => {
 //    res.redirect("https://google.com");
 //  });

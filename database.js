@@ -14,13 +14,17 @@ const pool = mysql.createPool({
 // Export the pool directly 
 export default pool; 
 
-// Export individual functions as named exports
 export async function showDatabase() {
-    const [rows] = await pool.query(`SELECT * FROM radcheck`);
-    return rows;
-
+    try {
+        const [rows] = await pool.query(`SELECT * FROM radcheck`);
+        return rows;
+    } catch (error) {
+        console.error('Error fetching database:', error);
+        throw error;    
+    }
 }   
 
+//deletes user data from the database
 export async function deleteUser(fullName, email) {
     try {
         const [result] = await pool.query(
@@ -39,6 +43,7 @@ export async function deleteUser(fullName, email) {
     }
 }
 
+//adds user data to the database
 export async function insertUserData(data) {
     try {
         const phone = cleanPhoneNumber(data.phone);
