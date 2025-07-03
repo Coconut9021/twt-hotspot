@@ -81,14 +81,14 @@ app.get("/", (req, res) => {
 
 app.get("/admin", async (req, res) => {
     try {
-        const data = await showDatabase();
+        // Empty data array - no sample users
+        const data = [];
         res.render("admin.ejs", { data });
     } catch (error) {
         console.error('Error loading admin page:', error);
         res.status(500).send('Error loading admin page');
     }
 });
-
 app.post('/delete-user', async (req, res) => {
     try {
         const { fullName, email } = req.body;

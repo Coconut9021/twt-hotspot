@@ -1,73 +1,66 @@
 import mysql from 'mysql2/promise';
-import dotenv from 'dotenv' 
-import { cleanPhoneNumber, scrubCompany } from './utils.js'
+import dotenv from 'dotenv';
 
 dotenv.config();
 
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD || undefined,
-    database: process.env.DB_NAME
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'twt_user',
+    password: process.env.DB_PASSWORD || 'TWT_Secure_2024!',
+    database: process.env.DB_DATABASE || 'twt_hotspot',
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-// Export the pool directly 
-export default pool; 
-
-// Export individual functions as named exports
-export async function showDatabase() {
-    const [rows] = await pool.query(`SELECT * FROM radcheck`);
-    return rows;
-
-}   
-
-export async function deleteUser(fullName, email) {
+export const showDatabase = async () => {
     try {
-        const [result] = await pool.query(
-            `DELETE FROM radcheck WHERE fullName = ? AND email = ?`, 
+        const [rows] = await pool.execute('SELECT * FROM users ORDER BY created_at DESC');
+        return rows;
+    } catch (error) {
+        console.error('Database error:', error);
+        throw error;
+    }
+};
+
+export const insertUserData = async (data) => {
+    try {
+        const [result] = await pool.execute(
+            'INSERT INTO users (fullName, email, phone, company, terms, marketing) VALUES (?, ?, ?, ?, ?, ?)',
+            [data.fullName, data.email, data.phone, data.company, data.terms ? 'Yes' : 'No', data.marketing ? 'Yes' : 'No']
+        );
+        return { success: true, insertId: result.insertId };
+    } catch (error) {
+        console.error('Insert error:', error);
+        throw error;
+    }
+};
+
+export const deleteUser = async (fullName, email) => {
+    try {
+        const [result] = await pool.execute(
+            'DELETE FROM users WHERE fullName = ? AND email = ?',
             [fullName, email]
         );
-        
-        if (result.affectedRows === 0) {
-            throw new Error('User not found');
-        }
-        
-        return { success: true, deletedCount: result.affectedRows };
+        return { success: true, affectedRows: result.affectedRows };
     } catch (error) {
-        console.error('Error deleting user:', error);
+        console.error('Delete error:', error);
         throw error;
     }
-}
+};
 
-export async function insertUserData(data) {
+export const findUserByCredentials = async (email, phone) => {
     try {
-        const phone = cleanPhoneNumber(data.phone);
-        const company = scrubCompany(data.company);
-
-        await pool.query(`
-            INSERT INTO radcheck 
-            (fullName, email, phone, company, terms, marketing, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, NOW())
-        `, [data.fullName, data.email, phone, company, data.terms, data.marketing]);
-        
-        return { success: true };
-    } catch (error) {
-        console.error('Error inserting user data:', error);
-        throw error;
-    }
-}
-
-export async function findUserByCredentials(email, phone) {
-    try {
-        const cleanedPhone = cleanPhoneNumber(phone);
-        const [rows] = await pool.query(
-            `SELECT * FROM radcheck WHERE email = ? AND phone = ?`,
-            [email, cleanedPhone]
+        const [rows] = await pool.execute(
+            'SELECT * FROM users WHERE email = ? AND phone = ?',
+            [email, phone]
         );
-        return rows[0]; // Return the user object if found, otherwise undefined
+        return rows[0] || null;
     } catch (error) {
-        console.error('Error finding user by credentials:', error);
+        console.error('Find user error:', error);
         throw error;
     }
-}
+};
 
+export default pool;
