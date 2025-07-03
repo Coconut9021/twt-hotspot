@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Connected to WiFi - TWT Hotspot</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="success-page">
+            <div class="success-animation">
+                <div class="wifi-icon animated">📶</div>
+                <div class="checkmark">✅</div>
+            </div>
+            
+            <h1 class="success-title">You're Connected!</h1>
+            <p class="success-message">Welcome to <strong><%= networkName %></strong> WiFi network</p>
+            
+            <div class="connection-info">
+                <div class="info-card">
+                    <h3>🌐 Connection Status</h3>
+                    <div class="status-row">
+                        <span class="label">Network:</span>
+                        <span class="value"><%= networkName %></span>
+                        <span class="status connected">Connected</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="label">Authentication:</span>
+                        <span class="value">Successful</span>
+                        <span class="status verified">Verified</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="label">Internet Access:</span>
+                        <span class="value">Available</span>
+                        <span class="status active">Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="next-steps">
+                <h3>🚀 What's Next?</h3>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-icon">🌍</div>
+                        <h4>Browse the Internet</h4>
+                        <p>You can now browse websites, check email, and use online services.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon">📱</div>
+                        <h4>Use Apps</h4>
+                        <p>Your mobile apps and services should now work with internet access.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon">⚡</div>
+                        <h4>Fast & Secure</h4>
+                        <p>Enjoy high-speed internet with enterprise-grade security.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button onclick="testConnection()" class="btn btn-primary">
+                    <span class="btn-icon">🔄</span>
+                    Test Connection
+                </button>
+                <a href="https://www.google.com" target="_blank" class="btn btn-secondary">
+                    <span class="btn-icon">🌐</span>
+                    Start Browsing
+                </a>
+            </div>
+
+            <div class="session-info">
+                <div class="info-banner">
+                    <span class="info-icon">ℹ️</span>
+                    <div class="info-content">
+                        <strong>Session Information</strong>
+                        <p>Your connection is active and secure. If you experience any issues, please contact our support team.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <a href="/wifi-login" class="link">Reconnect</a>
+                <span class="separator">|</span>
+                <a href="/admin" class="link">Support</a>
+                <span class="separator">|</span>
+                <a href="/" class="link">New User</a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .success-page {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .success-animation {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .wifi-icon {
+            font-size: 80px;
+            display: block;
+            margin: 0 auto 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .checkmark {
+            font-size: 40px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            animation: bounceIn 1s ease-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .success-title {
+            color: #28a745;
+            font-size: 2.5em;
+            margin: 20px 0 10px;
+            font-weight: bold;
+        }
+
+        .success-message {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+
+        .connection-info {
+            margin: 30px 0;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .info-card h3 {
+            margin: 0 0 15px 0;
+            color: #495057;
+            text-align: center;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .status-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        .value {
+            flex: 1;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        .status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.verified {
+            background: #cce7ff;
+            color: #004085;
+        }
+
+        .status.active {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .next-steps {
+            margin: 30px 0;
+        }
+
+        .next-steps h3 {
+            color: #495057;
+            margin-bottom: 20px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .step-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .step-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .step-card h4 {
+            margin: 10px 0 8px;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .step-card p {
+            color: #6c757d;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .session-info {
+            margin: 30px 0;
+        }
+
+        .info-banner {
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .info-icon {
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        .info-content strong {
+            display: block;
+            color: #004085;
+            margin-bottom: 5px;
+        }
+
+        .info-content p {
+            color: #004085;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .footer-links {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .link {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .separator {
+            margin: 0 10px;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .success-title {
+                font-size: 2em;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script>
+        function testConnection() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            
+            // Show loading state
+            btn.innerHTML = '<span class="btn-icon">⏳</span> Testing...';
+            btn.disabled = true;
+            
+            // Simulate connection test
+            fetch('/api/system-status')
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(() => {
+                        if (data.database) {
+                            btn.innerHTML = '<span class="btn-icon">✅</span> Connection Good!';
+                            btn.style.background = '#28a745';
+                        } else {
+                            btn.innerHTML = '<span class="btn-icon">⚠️</span> Connection Issues';
+                            btn.style.background = '#dc3545';
+                        }
+                        
+                        // Reset button after 3 seconds
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                            btn.style.background = '#28a745';
+                        }, 3000);
+                    }, 1000);
+                })
+                .catch(error => {
+                    setTimeout(() => {
+                        btn.innerHTML = '<span class="btn-icon">❌</span> Test Failed';
+                        btn.style.background = '#dc3545';
+                        
+                        // Reset button after 3 seconds
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                            btn.style.background = '#28a745';
+                        }, 3000);
+                    }, 1000);
+                });
+        }
+
+        // Auto-refresh page status every 30 seconds
+        setInterval(() => {
+            fetch('/api/system-status')
+                .then(response => response.json())
+                .then(data => {
+                    // Update connection status if needed
+                    console.log('System status:', data);
+                })
+                .catch(error => {
+                    console.log('Status check failed:', error);
+                });
+        }, 30000);
+    </script>
+</body>
+</html>

@@ -46,13 +46,27 @@ export async function insertUserData(data) {
 
         await pool.query(`
             INSERT INTO radcheck 
-            (fullName, email, phone, company, terms, marketing) 
-            VALUES (?, ?, ?, ?, ?, ?)
+            (fullName, email, phone, company, terms, marketing, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, NOW())
         `, [data.fullName, data.email, phone, company, data.terms, data.marketing]);
         
         return { success: true };
     } catch (error) {
         console.error('Error inserting user data:', error);
+        throw error;
+    }
+}
+
+export async function findUserByCredentials(email, phone) {
+    try {
+        const cleanedPhone = cleanPhoneNumber(phone);
+        const [rows] = await pool.query(
+            `SELECT * FROM radcheck WHERE email = ? AND phone = ?`,
+            [email, cleanedPhone]
+        );
+        return rows[0]; // Return the user object if found, otherwise undefined
+    } catch (error) {
+        console.error('Error finding user by credentials:', error);
         throw error;
     }
 }

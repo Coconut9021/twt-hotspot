@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import pool, { showDatabase, insertUserData, deleteUser } from './database.js' ;
+import pool, { showDatabase, insertUserData, deleteUser, findUserByCredentials } from './database.js' ;
 import radiusRoutes from './radius_routes.js';
 import { formatBytes, formatDuration } from './radius_data.js';
 
@@ -88,11 +88,73 @@ app.post('/delete-user', async (req, res) => {
     }
 });
 
-app.post("/success", (req, res) => {
-  const data = req.body;
-  insertUserData(data);
-  res.render('success.ejs');
+// New route for WiFi login page
+app.get("/wifi-login", (req, res) => {
+  res.render('wifi-login.ejs', { 
+    registrationSuccess: true, // Assume success for now
+    userName: 'Guest'
+  });
+});
+
+// New route to handle WiFi authentication
+app.post("/wifi-auth", async (req, res) => {
+  try {
+    const { email, phone } = req.body;
+
+    // Server-side validation for login credentials
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).render('wifi-login.ejs', { error: 'Please enter a valid email address.', registrationSuccess: false });
+    }
+    if (!phone || !/^07\d{8}$/.test(phone)) {
+        return res.status(400).render('wifi-login.ejs', { error: 'Please enter a valid 10-digit phone number starting with 07.', registrationSuccess: false });
+    }
+
+    const user = await findUserByCredentials(email, phone);
+
+    if (user) {
+      // Successful authentication
+      res.render('wifi-connected.ejs', {
+        connectionSuccess: true,
+        networkName: 'TWT-Guest'
+      });
+    } else {
+      // Failed authentication
+      res.render('wifi-login.ejs', {
+        error: 'Invalid credentials. Please check your email and phone number.',
+        registrationSuccess: false
+      });
+    }
+  } catch (error) {
+    console.error('Error during WiFi authentication:', error);
+    res.status(500).render('error.ejs', { error: 'An authentication error occurred. Please try again later.' });
+  }
 }) 
+
+app.post("/wifi-login", async (req, res) => {
+  try {
+    const data = req.body;
+    // Server-side validation
+    if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      return res.status(400).render('error.ejs', { error: 'A valid email address is required.' });
+    }
+    if (!data.phone || !/^07\d{8}$/.test(data.phone)) {
+      return res.status(400).render('error.ejs', { error: 'A valid 10-digit phone number starting with 07 is required.' });
+    }
+
+    await insertUserData(data);
+    
+    res.render('wifi-login.ejs', { 
+      registrationSuccess: true,
+      userName: data.fullName,
+      email: data.email,
+      phone: data.phone
+    });
+
+  } catch (error) {
+    console.error('Error processing form:', error);
+    res.status(500).render('error.ejs', { error: 'Failed to process your request. Please ensure the database is running.' });
+  }
+});
 
 // app.get("/{*splat}", (req, res) => {
 //    res.redirect("https://google.com");
