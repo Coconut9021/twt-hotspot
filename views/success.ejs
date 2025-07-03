@@ -4,96 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
-    <title>Registration Complete - TWT Hotspot</title>
+    <title>Registration Successful - TWT Hotspot</title>
 </head>
 
 <body>
     <div class="container">
         <div class="success" id="success">
-            <div class="success-icon">✅</div>
+            <div class="success-icon"></div>
             <h3>Registration Successful!</h3>
-            <p>Thank you for registering. Now you can connect to our WiFi network.</p>
-            
-            <div class="next-step-info">
-                <h4>� Next Step: WiFi Authentication</h4>
-                <p>To access the internet, please enter the WiFi credentials on the next page.</p>
-                <div class="credentials-hint">
-                    <p><strong>Default WiFi Credentials:</strong></p>
-                    <ul>
-                        <li>Username: <code>geenet</code></li>
-                        <li>Password: <code>geenet2025</code></li>
-                    </ul>
-                </div>
-            </div>
+            <p>You are now connected to the Wi-Fi network.</p>
             
             <div class="action-section">
-                <a href="/wifi-login" class="btn btn-primary">
-                    <span class="btn-icon">🚀</span>
-                    Continue to WiFi Login
+                <a href="https://www.google.com" class="btn btn-primary">
+                    Go to Brower
                 </a>
-                <p class="auto-redirect">You will be redirected automatically in <span id="countdown">5</span> seconds...</p>
+                <p class="auto-redirect">You will be redirected to browser in <span id="countdown">5</span> seconds...</p>
             </div>
         </div>
     </div>
 
     <style>
         .success-icon {
-            font-size: 64px;
+            font-size: 48px; /* Adjusted size */
             margin-bottom: 20px;
             animation: bounceIn 1s ease-out;
         }
 
-        @keyframes bounceIn {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .next-step-info {
-            background: #e3f2fd;
-            border: 1px solid #b8daff;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .next-step-info h4 {
-            margin: 0 0 10px 0;
-            color: #1565c0;
-            text-align: center;
-        }
-
-        .credentials-hint {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .credentials-hint p {
-            margin: 0 0 10px 0;
-            font-weight: bold;
-            color: #856404;
-        }
-
-        .credentials-hint ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .credentials-hint li {
-            margin: 5px 0;
-            color: #856404;
-        }
-
-        .credentials-hint code {
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            color: #e83e8c;
+        .success-icon::before {
+            content: '✔'; /* Using a simple checkmark character */
+            color: #28a745;
         }
 
         .action-section {
@@ -118,10 +57,6 @@
         .btn:hover {
             background: #c53030;
             transform: translateY(-2px);
-        }
-
-        .btn-icon {
-            font-size: 16px;
         }
 
         .auto-redirect {
@@ -157,7 +92,7 @@
             timeLeft--;
             
             if (timeLeft < 0) {
-                window.location.href = '/wifi-login';
+                window.location.href = 'https://www.google.com';
             } else {
                 setTimeout(updateCountdown, 1000);
             }
@@ -169,7 +104,7 @@
         // Allow manual navigation
         document.querySelector('.btn').addEventListener('click', function(e) {
             e.preventDefault();
-            window.location.href = '/wifi-login';
+            window.location.href = 'https://www.google.com';
         });
     </script>
 </body>

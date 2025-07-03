@@ -17,7 +17,7 @@
             <p class="subtitle">Please complete the form below to access Wi-Fi</p>
         </div>
 
-        <form id="wifiForm" action="/wifi-login" method="POST" novalidate>
+        <form id="wifiForm" action="/register" method="POST">
             <div class="form-group">
                 <label for="fullName">Full Name <span class="required">*</span></label>
                 <input type="text" id="fullName" name="fullName" required>
@@ -52,7 +52,7 @@
                 <label for="marketing">I would like to receive promotional emails and offers (optional)</label>
             </div>
 
-            <button type="submit" class="submit-btn">Connect to Wi-Fi</button>
+            <a href="/success" class="submit-btn" style="display: block; text-align: center; text-decoration: none; color: white;">Connect to Wi-Fi</a>
         </form>
 
     </div>
