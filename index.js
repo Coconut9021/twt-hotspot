@@ -8,22 +8,20 @@ import ejs from 'ejs';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
+import { config } from 'dotenv';
+config();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 const PORT = 3000;
-
-// RADIUS Configuration
-const RADIUS_SERVER = '127.0.0.1';
-const RADIUS_PORT = 1812;
-const RADIUS_SECRET = 'your_shared_secret_here'; // Must match clients.conf
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(session({
-    secret: RADIUS_SECRET,
+    secret: process.env.RADIUS_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false, maxAge: 3600000 } // 1 hour
@@ -90,7 +88,7 @@ function authenticateUser(username, password) {
             reject(error);
         });
 
-        client.send(packet, 0, packet.length, RADIUS_PORT, RADIUS_SERVER);
+        client.send(packet, 0, packet.length, process.env.RADIUS_PORT, process.env.RADIUS_SERVER);
     });
 }
 
@@ -208,8 +206,8 @@ app.get('/test-radius', async (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Captive Portal running on http://localhost:${PORT}`);
-    console.log(`RADIUS Server: ${RADIUS_SERVER}:${RADIUS_PORT}`);
+    console.log(`Captive Portal running on http://localhost:${process.env.PORT}`);
+    console.log(`RADIUS Server: ${process.env.RADIUS_SERVER}:${process.env.RADIUS_PORT}`);
     console.log('Test users: testuser/testpass, admin/admin123');
 });
 
