@@ -1,189 +1,220 @@
 import express from 'express';
+import radius from 'node-radius';
 import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-import pool, { showDatabase, insertUserData, deleteUser, findUserByCredentials } from './database.js' ;
-import radiusRoutes from './radius_routes.js';
-import { formatBytes, formatDuration } from './radius_data.js';
+import dgram from 'dgram';
+import path from 'path';
+import session from 'express-session';
+import ejs from 'ejs';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-// Load environment variables
-dotenv.config();
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const app = express();
+const PORT = 3000;
 
-// RADIUS Configuration from environment
-const RADIUS_CONFIG = {
-    server: process.env.RADIUS_SERVER || '41.191.232.2',
-    nas_ip: process.env.NAS_IP || '154.119.81.23',
-    secret: process.env.RADIUS_SECRET || 'testing123',
-    auth_port: 1812,
-    acct_port: 1813
-};
+// RADIUS Configuration
+const RADIUS_SERVER = '127.0.0.1';
+const RADIUS_PORT = 1812;
+const RADIUS_SECRET = 'your_shared_secret_here'; // Must match clients.conf
 
-app.use(express.static("public"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.set("view engine", "ejs");
-app.use(express.static("/public"));
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(express.static('public'));
+app.use(session({
+    secret: RADIUS_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 3600000 } // 1 hour
+}));
 
-// Set up EJS globals
-app.locals.formatBytes = formatBytes;
-app.locals.formatDuration = formatDuration;
-app.locals.RADIUS_CONFIG = RADIUS_CONFIG;
+// In-memory store for authenticated users (use database in production)
+const authenticatedUsers = new Map();
 
-// RADIUS routes
-app.use('/radius', radiusRoutes);
+// RADIUS Authentication Function
+function authenticateUser(username, password) {
+    return new Promise((resolve, reject) => {
+        const client = dgram.createSocket('udp4');
+        
+        // Create RADIUS packet
+        const packet = radius.encode({
+            code: 'Access-Request',
+            secret: RADIUS_SECRET,
+            identifier: Math.floor(Math.random() * 256),
+            attributes: [
+                ['User-Name', username],
+                ['User-Password', password],
+                ['NAS-IP-Address', NAS_IP6],
+                ['NAS-Port', 0]
+            ]
+        });
 
-// API route for RADIUS server status
-app.get('/api/radius-status', (req, res) => {
-    res.json({
-        radius_server: RADIUS_CONFIG.server,
-        nas_ip: RADIUS_CONFIG.nas_ip,
-        auth_port: RADIUS_CONFIG.auth_port,
-        acct_port: RADIUS_CONFIG.acct_port,
-        status: 'active',
-        server_type: 'FreeRADIUS',
-        timestamp: new Date().toISOString()
+        // Set timeout
+        const timeout = setTimeout(() => {
+            client.close();
+            reject(new Error('RADIUS request timeout'));
+        }, 5000);
+
+        client.on('message', (msg, rinfo) => {
+            clearTimeout(timeout);
+            
+            try {
+                const response = radius.decode({
+                    packet: msg,
+                    secret: RADIUS_SECRET
+                });
+
+                if (response.code === 'Access-Accept') {
+                    const replyMessage = response.attributes['Reply-Message'];
+                    resolve({
+                        success: true,
+                        message: replyMessage || 'Authentication successful'
+                    });
+                } else {
+                    resolve({
+                        success: false,
+                        message: 'Invalid credentials'
+                    });
+                }
+            } catch (error) {
+                reject(error);
+            }
+            
+            client.close();
+        });
+
+        client.on('error', (error) => {
+            clearTimeout(timeout);
+            client.close();
+            reject(error);
+        });
+
+        client.send(packet, 0, packet.length, RADIUS_PORT, RADIUS_SERVER);
     });
+}
+
+// Routes
+app.get('/', (req, res) => {
+    // Check if user is already authenticated
+    if (req.session.authenticated) {
+        return res.redirect('/success');
+    }
+    
+    res.sendFile(path.join(__dirname, 'views', 'index.ejs'));
 });
 
-// API routes for system status
-app.get('/api/system-status', async (req, res) => {
-    try {
-        // Test database connection
-        const [rows] = await pool.execute('SELECT 1');
-        const dbStatus = rows.length > 0;
-        
-        res.json({
-            database: dbStatus,
-            radius: true, // You can implement actual RADIUS server check here
-            timestamp: new Date().toISOString()
-        });
-    } catch (error) {
-        res.json({
-            database: false,
-            radius: false,
-            error: error.message,
-            timestamp: new Date().toISOString()
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.ejs'));
+});
+
+app.post('/authenticate', async (req, res) => {
+    const { email, name } = req.body;
+    
+    if (!email || !name) {
+        return res.status(400).json({
+            success: false,
+            message: 'Username and password are required'
         });
     }
-});
 
-app.get('/api/uptime', (req, res) => {
-    res.json({
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString()
-    });
-});
-
-app.get("/", (req, res) => {
-  res.render("index.ejs", { error: null });
-})
-
-app.get("/admin", async (req, res) => {
     try {
-        // Empty data array - no sample users
-        const data = [];
-        res.render("admin.ejs", { data });
-    } catch (error) {
-        console.error('Error loading admin page:', error);
-        res.status(500).send('Error loading admin page');
-    }
-});
-app.post('/delete-user', async (req, res) => {
-    try {
-        const { fullName, email } = req.body;
+        console.log(`Attempting authentication for user: ${email}`);
+        const result = await authenticateUser(email, name);
         
-        if (!fullName || !email) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Name and email are required' 
+        if (result.success) {
+            // Store authentication in session
+            req.session.authenticated = true;
+            req.session.username = email;
+            
+            // Store in memory (use database in production)
+            authenticatedUsers.set(email, {
+                authenticatedAt: new Date(),
+                ipAddress: req.ip,
+                sessionId: req.sessionID
+            });
+            
+            console.log(`User ${email} authenticated successfully`);
+            res.json({
+                success: true,
+                message: result.message,
+                redirectUrl: '/success'
+            });
+        } else {
+            console.log(`Authentication failed for user: ${email}`);
+            res.status(401).json({
+                success: false,
+                message: result.message
             });
         }
-
-        const result = await deleteUser(fullName, email);
-        res.json(result);
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            error: error.message 
+        console.error('Authentication error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Authentication service unavailable'
         });
     }
 });
 
-// This route is no longer needed as the main page handles the form
-// app.get("/wifi-login", (req, res) => {
-//   res.render('wifi-login.ejs', { 
-//     registrationSuccess: true, // Assume success for now
-//     userName: 'Guest'
-//   });
-// });
-
-// This route is no longer needed as the main page handles the form
-// app.post("/wifi-auth", async (req, res) => {
-//   try {
-//     const { email, phone } = req.body;
-//
-//     // Server-side validation for login credentials
-//     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-//       return res.status(400).render('index.ejs', { error: 'Please enter a valid email address.', registrationSuccess: false });
-//     }
-//     if (!phone || !/^07\d{8}$/.test(phone)) {
-//         return res.status(400).render('index.ejs', { error: 'Please enter a valid 10-digit phone number starting with 07.', registrationSuccess: false });
-//     }
-//
-//     const user = await findUserByCredentials(email, phone);
-//
-//     if (user) {
-//       // Successful authentication
-//       res.render('wifi-connected.ejs', {
-//         connectionSuccess: true,
-//         networkName: 'TWT-Guest'
-//       });
-//     } else {
-//       // Failed authentication
-//       res.render('index.ejs', {
-//         error: 'Invalid credentials. Please check your email and phone number.',
-//         registrationSuccess: false
-//       });
-//     }
-//   } catch (error) {
-//     console.error('Error during WiFi authentication:', error);
-//     res.status(500).render('error.ejs', { error: 'An authentication error occurred. Please try again later.' });
-//   }
-// }) 
-
-app.post("/register", async (req, res) => {
-  const data = req.body;
-  // Server-side validation
-  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    return res.status(400).render('index.ejs', { error: 'A valid email address is required.' });
-  }
-  if (!data.phone || !/^07\d{8}$/.test(data.phone)) {
-    return res.status(400).render('index.ejs', { error: 'A valid 10-digit phone number starting with 07 is required.' });
-  }
-
-  // Bypassing database logic for now
-  // try {
-    // const existingUser = await findUserByCredentials(data.email, data.phone);
-    // if (!existingUser) {
-    //     await insertUserData(data);
-    // }
-    
-    res.redirect('/success');
-
-  // } catch (error) {
-  //   console.error('Error processing form:', error);
-  //   res.status(500).render('error.ejs', { error: 'Failed to process your request. Please ensure the database is running.' });
-  // }
-});
-
-// Serve the success page
 app.get('/success', (req, res) => {
-    res.render('success');
+    if (!req.session.authenticated) {
+        return res.redirect('/login');
+    }
+    
+    res.sendFile(path.join(__dirname, 'public', 'success.ejs'));
 });
 
-const PORT = process.env.PORT || 8024;
+app.get('/logout', (req, res) => {
+    const username = req.session.email;
+    
+    // Remove from authenticated users
+    if (username) {
+        authenticatedUsers.delete(email);
+    }
+    
+    // Destroy session
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+        }
+        res.redirect('/login');
+    });
+});
+
+// API endpoint to check authentication status
+app.get('/api/status', (req, res) => {
+    res.json({
+        authenticated: !!req.session.authenticated,
+        username: req.session.username || null,
+        authenticatedUsers: Array.from(authenticatedUsers.keys())
+    });
+});
+
+// Test RADIUS connection
+app.get('/test-radius', async (req, res) => {
+    try {
+        const result = await authenticateUser('testuser', 'testpass');
+        res.json({
+            message: 'RADIUS test completed',
+            result: result
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'RADIUS test failed',
+            error: error.message
+        });
+    }
+});
+
+// Start server
 app.listen(PORT, () => {
-  console.log(`server running at http://localhost:${PORT}`);
+    console.log(`Captive Portal running on http://localhost:${PORT}`);
+    console.log(`RADIUS Server: ${RADIUS_SERVER}:${RADIUS_PORT}`);
+    console.log('Test users: testuser/testpass, admin/admin123');
 });
 
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+    console.log('\nShutting down gracefully...');
+    process.exit(0);
+});

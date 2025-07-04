@@ -28,6 +28,15 @@
     "dotenv": "^16.6.1",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
-    "mysql2": "^3.14.1"
+    "express-session": "^1.18.1",
+    "mysql2": "^3.14.1",
+    "node-radius": "^0.0.1",
+    "radius": "^1.1.4"
+  },
+  "overrides": {
+    "node-radius": {
+      "uglify-js": "^3.17.4",
+      "clean-css": "^5.3.2"
+    }
   }
 }
