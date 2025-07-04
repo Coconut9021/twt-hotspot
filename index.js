@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(session({
-    secret: process.env.RADIUS_SECRET,
+    secret: RADIUS_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false, maxAge: 3600000 } // 1 hour
@@ -37,7 +37,7 @@ function authenticateUser(username, password) {
         // Create RADIUS packet
         const packet = radius.encode({
             code: 'Access-Request',
-            secret: RADIUS_SECRET,
+            secret: process.env.RADIUS_SECRET,
             identifier: Math.floor(Math.random() * 256),
             attributes: [
                 ['User-Name', username],
