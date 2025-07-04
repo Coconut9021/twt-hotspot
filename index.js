@@ -14,7 +14,6 @@ config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
-const PORT = 3000;
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -43,8 +42,8 @@ function authenticateUser(username, password) {
             attributes: [
                 ['User-Name', username],
                 ['User-Password', password],
-                ['NAS-IP-Address', NAS_IP6],
-                ['NAS-Port', 0]
+                ['NAS-IP-Address', NAS_IP],
+                ['NAS-Port', RADIUS_PORT]
             ]
         });
 
