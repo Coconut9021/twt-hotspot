@@ -13,6 +13,7 @@ config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+import pool, { showDatabase, insertUserData, deleteUser } from './database.js' ;
 const app = express();
 
 // Middleware
@@ -22,7 +23,7 @@ app.use(express.static('public'));
 app.use(session({
     secret: RADIUS_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false,   
     cookie: { secure: false, maxAge: 3600000 } // 1 hour
 }));
 
@@ -159,6 +160,26 @@ app.get('/success', (req, res) => {
     }
     
     res.sendFile(path.join(__dirname, 'public', 'success.ejs'));
+});
+
+app.post("/success", (req, res) => {
+  const data = req.body;
+  insertUserData(data);
+  res.render('success.ejs');
+}) 
+
+app.post("/send-radius", (req, res) => { 
+    
+ });
+  
+// app.get("/{*splat}", (req, res) => {
+//    res.redirect("https://google.com");
+//  });
+
+const PORT = process.env.PORT;
+
+app.listen(PORT, () => {
+  console.log(`server running at http://localhost:${PORT}`);
 });
 
 app.get('/logout', (req, res) => {

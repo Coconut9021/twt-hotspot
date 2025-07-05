@@ -14,7 +14,25 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+<<<<<<< HEAD
 export const showDatabase = async () => {
+=======
+// Export the pool directly 
+export default pool; 
+
+export async function showDatabase() {
+    try {
+        const [rows] = await pool.query(`SELECT * FROM radcheck`);
+        return rows;
+    } catch (error) {
+        console.error('Error fetching database:', error);
+        throw error;    
+    }
+}   
+
+//deletes user data from the database
+export async function deleteUser(fullName, email) {
+>>>>>>> 1c84dfe88f474ab5f2940a8308bf436390404a3b
     try {
         const [rows] = await pool.execute('SELECT * FROM users ORDER BY created_at DESC');
         return rows;
@@ -50,7 +68,12 @@ export const deleteUser = async (fullName, email) => {
     }
 };
 
+<<<<<<< HEAD
 export const findUserByCredentials = async (email, phone) => {
+=======
+//adds user data to the database
+export async function insertUserData(data) {
+>>>>>>> 1c84dfe88f474ab5f2940a8308bf436390404a3b
     try {
         const [rows] = await pool.execute(
             'SELECT * FROM users WHERE email = ? AND phone = ?',
