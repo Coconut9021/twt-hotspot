@@ -1,18 +1,33 @@
 import express from 'express';
-import bodyParser from 'body-parser';
-import pool, { showDatabase, insertUserData, deleteUser } from './database.js' ;
+import pool, { 
+    authenticateUser, 
+    insertUserData, 
+    deleteUser,
+    showDatabase,
+} from './database.js';
+
 const app = express();
 
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
-app.use(express.static("/public"));
 
 app.get("/", (req, res) => {
   res.render("index.ejs");
-
 })
+
+app.post("/submit-form", async (req, res) => {
+    console.log('form submission received:');
+    try {
+        const formData = req.body;
+        await insertUserData(formData);
+        res.render('success.ejs', { username: formData.email });
+    } catch (error) {
+        console.error('Form submission error:', error);
+        res.status(500).render('error.ejs', { message: 'Failed to process form submission' });
+    }
+});
 
 app.get("/admin", async (req, res) => {
     try {
@@ -45,15 +60,38 @@ app.post('/delete-user', async (req, res) => {
     }
 });
 
+// RADIUS authentication endpoint (for API)
+app.post("/api/auth", async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const authResult = await authenticateUser(username, password);
+        
+        if (authResult.success) {
+            res.json({
+                success: true,
+                username: authResult.username,
+                groups: authResult.groups
+            });
+        } else {
+            res.status(401).json({
+                success: false,
+                message: authResult.message || 'Authentication failed'
+            });
+        }
+    } catch (error) {
+        console.error('Auth error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
+    }
+});
+
 app.post("/success", (req, res) => {
   const data = req.body;
-  insertUserData(data);
+  console.log(data)
   res.render('success.ejs');
 }) 
-
-// app.get("/{*splat}", (req, res) => {
-//    res.redirect("https://google.com");
-//  });
 
 const PORT = process.env.PORT;
 

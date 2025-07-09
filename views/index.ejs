@@ -17,7 +17,7 @@
             <p class="subtitle">Please complete the form below to access Wi-Fi</p>
         </div>
 
-        <form id="wifiForm" action="/success" method="POST">
+        <form id="wifiForm" action="/submit-form" method="POST">
             <div class="form-group">
                 <label for="fullName">Full Name <span class="required">*</span></label>
                 <input type="text" id="fullName" name="fullName" required>
@@ -120,7 +120,7 @@
                     // Create a form and submit it
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = '/success';
+                    form.action = '/submit-form';
                     
                     // Add form data as hidden inputs
                     Object.keys(formData).forEach(key => {
