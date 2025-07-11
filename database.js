@@ -22,6 +22,7 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+const USER_PASSWORD = process.env.USER_PASSWORD;
 // Export the pool directly 
 export default pool; 
 
@@ -38,7 +39,7 @@ export default pool;
 // }
 
 // RADIUS Authentication Functions
-export async function authenticateUser(username, password) {
+export async function authenticateUser(username) {
     try {
         const [users] = await pool.query(
             `SELECT * FROM radcheck 
@@ -49,12 +50,6 @@ export async function authenticateUser(username, password) {
         if (users.length === 0) {
             return { success: false, message: 'User not found' };
         }
-
-        const user = users[0];
-        if (password !== user.value) {
-            return { success: false, message: 'Invalid password' };
-        }
-
         // Get user groups if needed
         const [groups] = await pool.query(
             `SELECT GroupName FROM radusergroup 
@@ -74,24 +69,30 @@ export async function authenticateUser(username, password) {
 }
 
 export async function insertUserData(data) {
-    console.log('it gets this far')
     try {
-        // const phone = cleanPhoneNumber(data.phone);
-        // const company = scrubCompany(data.company);
-
-        // Validate required fields
         if (!data.email || !data.fullName || !data.terms) {
             throw new Error('Missing required fields');
         }
 
-        // Also create RADIUS user if needed
-        if (data.email != null && data.fullName != null && data.terms == 'true') {
-            await pool.query(`
-                INSERT INTO radcheck 
-                (username, attribute, op, value)
-                VALUES (?, 'Cleartext-Password', ':=', ?)
-            `, [data.email, process.env.USER_PASSWORD]);
-        }
+        // Insert into radcheck for authentication
+        await pool.query(`
+            INSERT INTO radcheck 
+            (username, attribute, op, value)
+            VALUES (?, 'Cleartext-Password', ':=', ?)
+        `, [data.email, USER_PASSWORD]);
+
+        // Insert into user profile table 
+        await pool.query(`
+            INSERT INTO user_profiles 
+            (email, fullName, phone, company, terms, marketing)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `, [data.email, data.fullName, data.phone, data.company, data.terms, data.marketing]);
+
+        await pool.query(`
+            INSERT INTO radusergroup
+            (UserName, GroupName, priority)
+            VALUES (?, 'user', 0)
+        `, [data.email]);
 
         return { success: true };
     } catch (error) {
@@ -100,12 +101,12 @@ export async function insertUserData(data) {
     }
 }
 
-export async function deleteUser(fullName, email) {
+export async function deleteUser(email) {
     try {
-        const [result] = await pool.query(
-            `DELETE FROM radcheck WHERE fullName = ? AND email = ?`, 
-            [fullName, email]
-        );
+        // Delete from all related tables
+        await pool.query(`DELETE FROM radcheck WHERE username = ?`, [email]);
+        await pool.query(`DELETE FROM radusergroup WHERE UserName = ?`, [email]);
+        const [result] = await pool.query(`DELETE FROM user_profiles WHERE email = ?`, [email]);
         
         if (result.affectedRows === 0) {
             throw new Error('User not found');
@@ -120,8 +121,39 @@ export async function deleteUser(fullName, email) {
 
 // Admin functions
 export async function showDatabase() {
-    const [rows] = await pool.query(`SELECT * FROM radcheck`);
-    return rows;
+    try {
+        // Get all user profiles
+        const [fullData] = await pool.query('SELECT * FROM user_profiles');
+        
+        // Get user groups with their full names
+        const [groups] = await pool.query(`
+            SELECT rg.UserName as email, rg.GroupName, up.fullName
+            FROM radusergroup rg
+            LEFT JOIN user_profiles up ON rg.UserName = up.email
+        `);
+        
+        return { fullData, groups };
+    } catch (error) {
+        console.error('Database error:', error);
+        throw error;
+    }
+}
+
+export async function checkAdmin(email) {
+    try{
+        const [checkAdmin] = await pool.query(`
+            SELECT GroupName FROM radusergroup 
+            WHERE UserName = ?`, 
+            [ email ]
+        ); // Use a default admin username if
+        if (checkAdmin == admin) {
+            return true;
+        }
+    } catch (error) {
+        console.error('Error finding admin user:', error);
+        throw error
+        return false;
+    }
 }
 
 

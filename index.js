@@ -4,6 +4,8 @@ import pool, {
     insertUserData, 
     deleteUser,
     showDatabase,
+    checkAdmin,
+    // testConnection
 } from './database.js';
 
 const app = express();
@@ -17,40 +19,73 @@ app.get("/", (req, res) => {
   res.render("index.ejs");
 })
 
-app.post("/submit-form", async (req, res) => {
-    console.log('form submission received:');
+app.post('/submit-form', async (req, res) => {
+    const data = req.body;
+    console.log('Form data received:', data);
     try {
-        const formData = req.body;
-        await insertUserData(formData);
-        res.render('success.ejs', { username: formData.email });
+        const auth = await authenticateUser(data.email);
+        
+        if (auth.success) {
+            console.log('User authenticated successfully:', auth);
+            try {
+                res.redirect("/check-admin")
+            } catch (error) {
+                res.status(500).send('error redirecting you to admin', { 
+            message: error.message || 'Failed to confirm role' 
+        });
+            }
+            res.redirect('/success');
+        } else {
+            const formData = req.body;
+            await insertUserData(formData);
+            console.log('User registered successfully:');
+            res.render('success.ejs');
+        }
     } catch (error) {
-        console.error('Form submission error:', error);
-        res.status(500).render('error.ejs', { message: 'Failed to process form submission' });
+        console.error('Error:', error);
+        res.status(500).send('error message', { 
+            message: error.message || 'Failed to process form submission' 
+        });
     }
 });
 
 app.get("/admin", async (req, res) => {
     try {
-        const data = await showDatabase();
-        res.render("admin.ejs", { data });
+        const { fullData, groups } = await showDatabase();
+        res.render("admin.ejs", { 
+            fullData, 
+            groups 
+        });
     } catch (error) {
         console.error('Error loading admin page:', error);
-        res.status(500).send('Error loading admin page');
+        res.status(500).send('error confirming role',{ 
+            message: 'Failed to load admin data' 
+        });
     }
+});
+
+app.post("/check-admin", async (req, res) => {
+    const isAdmin = checkAdmin(req.body.email);
+    if (isAdmin == true){
+        res.render('admin.ejs')
+    } else {
+        res.redirect('success.ejs')
+    }
+    
 });
 
 app.post('/delete-user', async (req, res) => {
     try {
-        const { fullName, email } = req.body;
+        const { email } = req.body;
         
-        if (!fullName || !email) {
+        if (!email) {
             return res.status(400).json({ 
                 success: false, 
-                error: 'Name and email are required' 
+                error: 'Email is required' 
             });
         }
 
-        const result = await deleteUser(fullName, email);
+        const result = await deleteUser(email);
         res.json(result);
     } catch (error) {
         res.status(500).json({ 
@@ -60,23 +95,34 @@ app.post('/delete-user', async (req, res) => {
     }
 });
 
+// app.post("/api/test", (req, res) => {
+//     const { username, password } = req.body;
+//     testConnection(username, password)
+//         .then(result => {
+//             res.json({ success: true, message: 'Connection successful', result });
+//         })
+//         .catch(error => {
+//             console.error('Test connection error:', error);
+//             res.status(500).json({ 
+//                 success: false, 
+//                 message: 'Connection failed', 
+//                 error: error.message 
+//             });
+//         });
+// });
+
 // RADIUS authentication endpoint (for API)
 app.post("/api/auth", async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const authResult = await authenticateUser(username, password);
+        const { email } = req.body;
+        const authResult = await authenticateUser(email);
         
         if (authResult.success) {
-            res.json({
-                success: true,
-                username: authResult.username,
-                groups: authResult.groups
-            });
+              res.redirect('/success');
+
         } else {
-            res.status(401).json({
-                success: false,
-                message: authResult.message || 'Authentication failed'
-            });
+              res.render('error.ejs');
+
         }
     } catch (error) {
         console.error('Auth error:', error);
@@ -88,8 +134,6 @@ app.post("/api/auth", async (req, res) => {
 });
 
 app.post("/success", (req, res) => {
-  const data = req.body;
-  console.log(data)
   res.render('success.ejs');
 }) 
 
