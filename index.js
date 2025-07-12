@@ -126,27 +126,27 @@ app.post('/delete-user', async (req, res) => {
 //         });
 // });
 
-// RADIUS authentication endpoint (for API)
-app.post("/api/auth", async (req, res) => {
-    try {
-        const { email } = req.body;
-        const authResult = await authenticateUser(email);
+// // RADIUS authentication endpoint (for API)
+// app.post("/api/auth", async (req, res) => {
+//     try {
+//         const { email } = req.body;
+//         const authResult = await authenticateUser(email);
         
-        if (authResult.success) {
-              res.redirect('/success');
+//         if (authResult.success) {
+//               res.redirect('/success');
 
-        } else {
-              res.render('error.ejs');
+//         } else {
+//               res.render('error.ejs');
 
-        }
-    } catch (error) {
-        console.error('Auth error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal server error' 
-        });
-    }
-});
+//         }
+//     } catch (error) {
+//         console.error('Auth error:', error);
+//         res.status(500).json({ 
+//             success: false, 
+//             message: 'Internal server error' 
+//         });
+//     }
+// });
 
 
 const PORT = process.env.PORT;
