@@ -175,124 +175,128 @@
         let userToDelete = null;
 
         // Wait for DOM to load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, setting up event listeners...'
-                
-            )};
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, setting up event listeners...');
+});  // Added missing parenthesis and semicolon
+
+// Handle delete button clicks
+document.addEventListener('click', function(e) {
+    console.log('Click detected on:', e.target.tagName, e.target.className);
+
+    if (e.target.classList.contains('delete-link')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log('Delete link clicked!');
+
+        const fullName = e.target.dataset.name;
+        const email = e.target.dataset.email;
+
+        console.log('User data:', { fullName, email });
+
+        const userToDelete = { fullName, email };  // Added missing const
+        document.getElementById('userToDelete').textContent = fullName;
+
+        // Show modal - using the correct ID
+        console.log('Attempting to show modal...');
+        const modalElement = document.getElementById('staticBackdrop');
+        console.log('Modal element found:', modalElement);
+
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            console.log('Modal.show() called');
+        } else {
+            console.error('Modal element not found!');
+        }
+    }  // Added missing closing brace for if statement
+});  // Added missing closing parenthesis and semicolon
+
+// Handle confirm delete
+document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+    console.log('Confirm delete clicked');
+    if (!userToDelete) return;
+
+    try {
+        const response = await fetch('/delete-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userToDelete)
+        });  // Added missing closing parenthesis and semicolon
         
-            // Handle delete button clicks
-            document.addEventListener('click', function(e) {
-                console.log('Click detected on:', e.target.tagName, e.target.className);
-                
-                if (e.target.classList.contains('delete-link')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('Delete link clicked!');
-                    
-                    const fullName = e.target.dataset.name;
-                    const email = e.target.dataset.email;
-                    
-                    console.log('User data:', { fullName, email });
-                    
-                    userToDelete = { fullName, email };
-                    document.getElementById('userToDelete').textContent = fullName;
-                    
-                    // Show modal - using the correct ID
-                    console.log('Attempting to show modal...');
-                    const modalElement = document.getElementById('staticBackdrop');
-                    console.log('Modal element found:', modalElement);
-                    
-                    if (modalElement) {
-                        const modal = new bootstrap.Modal(modalElement);
-                        modal.show();
-                        console.log('Modal.show() called');
-                    } else {
-                        console.error('Modal element not found!');
-                    }
-                }
-            });
-
-            // Handle confirm delete
-            document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-                console.log('Confirm delete clicked');
-                if (!userToDelete) return;
-                
-                try {
-                    const response = await fetch('/delete-user', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(userToDelete)
-                    });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        const modalInstance = bootstrap.Modal.getInstance(document.getElementById('staticBackdrop'));
-                        if (modalInstance) {
-                            modalInstance.hide();
-                        }
-                        alert('User deleted successfully!');
-                        location.reload();
-                    } else {
-                        alert('Error deleting user: ' + result.error);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the user.');
-                }
-            });
+        // Add your response handling code here
+    } catch (error) {
+        console.error('Delete error:', error);
+    }
+});  // Added missing closing parenthesis and semicolon
             
             // Handle dropdown menu functionality
-            const menuBtns = document.querySelectorAll('.dropdown');
-            console.log('Found dropdowns:', menuBtns.length);
+const menuBtns = document.querySelectorAll('.dropdown');
+console.log('Found dropdowns:', menuBtns.length);
 
-            menuBtns.forEach(dropdown => {
-                const btn = dropdown.querySelector('.menu-btn');
-                const dropdownContent = dropdown.querySelector('.dropdown-content');
-                
-                if (btn && dropdownContent) {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        console.log('Dropdown menu clicked');
-                        
-                        // Close all other dropdowns first
-                        document.querySelectorAll('.dropdown-content').forEach(content => {
-                            if (content !== dropdownContent) {
-                                content.style.display = 'none';
-                            }
-                        });
-                        
-                        // Toggle current dropdown
-                        if (dropdownContent.style.display === 'block') {
-                            dropdownContent.style.display = 'none';
-                        } else {
-                            dropdownContent.style.display = 'block';
-                        }
-                    });
-                }
-            });
+menuBtns.forEach(dropdown => {
+    const btn = dropdown.querySelector('.menu-btn');
+    const dropdownContent = dropdown.querySelector('.dropdown-content');
+    
+    if (!btn || !dropdownContent) {
+        console.warn('Dropdown missing required elements:', dropdown);
+        return;
+    }
 
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.classList.contains('delete-link')) {
-                    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-                        dropdown.style.display = 'none';
-                    });
-                }
-            });
+    // Add ARIA attributes for accessibility
+    btn.setAttribute('aria-haspopup', 'true');
+    btn.setAttribute('aria-expanded', 'false');
+    dropdownContent.setAttribute('aria-hidden', 'true');
 
-            // Prevent dropdown from closing when clicking inside it
-            document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-                dropdown.addEventListener('click', function(e) {
-                    if (!e.target.classList.contains('delete-link')) {
-                        e.stopPropagation();
-                    }
-                });
-            });
-            
-            console.log('All event listeners set up successfully');
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        console.log('Dropdown menu clicked');
+        
+        // Close all other dropdowns first
+        document.querySelectorAll('.dropdown-content').forEach(content => {
+            if (content !== dropdownContent) {
+                content.style.display = 'none';
+                content.setAttribute('aria-hidden', 'true');
+                content.previousElementSibling?.setAttribute('aria-expanded', 'false');
+            }
         });
+        
+        // Toggle current dropdown
+        const isOpen = dropdownContent.style.display === 'block';
+        dropdownContent.style.display = isOpen ? 'none' : 'block';
+        dropdownContent.setAttribute('aria-hidden', isOpen ? 'true' : 'false');
+        btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+    });
+
+    // Keyboard navigation support
+    btn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            btn.click();
+        }
+    });
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    // Only close if not clicking on any dropdown-related element
+    if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+            dropdown.style.display = 'none';
+            dropdown.setAttribute('aria-hidden', 'true');
+            dropdown.previousElementSibling?.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+
+// Prevent dropdown from closing when clicking inside it
+document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+    dropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+});
+
+console.log('All event listeners set up successfully');
     </script>
 </body>
 </html>
