@@ -20,35 +20,55 @@ app.get("/", (req, res) => {
 })
 
 app.post('/submit-form', async (req, res) => {
-    const data = req.body;
-    console.log('Form data received:', data);
+    const data = req.body;    
     try {
         const auth = await authenticateUser(data.email);
         
-        if (auth.success) {
-            console.log('User authenticated successfully:', auth);
+        if (auth.success === true) {            
             try {
-                res.redirect("/check-admin")
+                const isAdmin = await checkAdmin(req.body.email); // Added await here
+                if (isAdmin === true) {
+                    res.redirect('/admin');
+                } else {
+                    res.redirect('/returning');
+                }
             } catch (error) {
-                res.status(500).send('error redirecting you to admin', { 
-            message: error.message || 'Failed to confirm role' 
-        });
+                res.status(500).send(`error redirecting you to admin: ${error.message || 'Failed to confirm role'}`);
             }
-            res.redirect('/success');
         } else {
             const formData = req.body;
             await insertUserData(formData);
-            console.log('User registered successfully:');
-            res.render('success.ejs');
+            res.redirect('/registered');
         }
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).send('error message', { 
-            message: error.message || 'Failed to process form submission' 
-        });
+        res.status(500).send(`error message: ${error.message || 'Failed to process form submission'}`);
     }
 });
 
+app.get("/registered", (req, res) => {
+    try {
+        res.render('registered.ejs');
+
+    } catch (error) {
+        console.error('Error loading success page:', error)
+        res.status(500).send('error rendering page', {
+            message: 'Failed to load success page'
+        })
+    }
+}) 
+
+app.get("/returning", (req, res) => {
+    try {
+        res.render('returning.ejs');
+
+    } catch (error) {
+        console.error('Error loading sucreturningcess page:', error)
+        res.status(500).send('error rendering page', {
+            message: 'Failed to load returning page'
+        })
+    }
+}) 
 app.get("/admin", async (req, res) => {
     try {
         const { fullData, groups } = await showDatabase();
@@ -65,12 +85,7 @@ app.get("/admin", async (req, res) => {
 });
 
 app.post("/check-admin", async (req, res) => {
-    const isAdmin = checkAdmin(req.body.email);
-    if (isAdmin == true){
-        res.render('admin.ejs')
-    } else {
-        res.redirect('success.ejs')
-    }
+    
     
 });
 
@@ -133,9 +148,6 @@ app.post("/api/auth", async (req, res) => {
     }
 });
 
-app.post("/success", (req, res) => {
-  res.render('success.ejs');
-}) 
 
 const PORT = process.env.PORT;
 

@@ -141,18 +141,17 @@ export async function showDatabase() {
 
 export async function checkAdmin(email) {
     try{
-        const [checkAdmin] = await pool.query(`
+        const checkAdmin = await pool.query(`
             SELECT GroupName FROM radusergroup 
-            WHERE UserName = ?`, 
-            [ email ]
-        ); // Use a default admin username if
-        if (checkAdmin == admin) {
+            WHERE UserName = ?`, [ email ] ); 
+        if (checkAdmin[0][0].GroupName === "admin") {
             return true;
+        } else {
+            return false;
         }
     } catch (error) {
         console.error('Error finding admin user:', error);
         throw error
-        return false;
     }
 }
 
