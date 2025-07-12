@@ -57,27 +57,30 @@
                         <td><%= row.terms %></td>
                         <td><%= row.marketing %></td>
                         <td>
-                            <div class="dropdown">
-                                <div class="menu-btn">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="12" cy="6" r="2" fill="#666666"/>
-                                        <circle cx="12" cy="12" r="2" fill="#666666"/>
-                                        <circle cx="12" cy="18" r="2" fill="#666666"/>
-                                    </svg>
+                                    <div class="row justify-content-evenly">
+                                        <div role='button' class="col-1 dropdown">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 21V16.75L16.2 3.575C16.4 3.39167 16.6208 3.25 16.8625 3.15C17.1042 3.05 17.3583 3 17.625 3C17.8917 3 18.15 3.05 18.4 3.15C18.65 3.25 18.8667 3.4 19.05 3.6L20.425 5C20.625 5.18333 20.7708 5.4 20.8625 5.65C20.9542 5.9 21 6.15 21 6.4C21 6.66667 20.9542 6.92083 20.8625 7.1625C20.7708 7.40417 20.625 7.625 20.425 7.825L7.25 21H3ZM17.6 7.8L19 6.4L17.6 5L16.2 6.4L17.6 7.8Z" fill="#1D1B20"/>
+                                            </svg>
+                                        </div>
+                                        <div role='button' class="col-1 delete-link" data-email="<%= row.email %>">
+                                            <svg width="22" height="24" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2 6H4M4 6H20M4 6V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H16C16.5304 22 17.0391 21.7893 17.4142 21.4142C17.7893 21.0391 18 20.5304 18 20V6M7 6V4C7 3.46957 7.21071 2.96086 7.58579 2.58579C7.96086 2.21071 8.46957 2 9 2H13C13.5304 2 14.0391 2.21071 14.4142 2.58579C14.7893 2.96086 15 3.46957 15 4V6M9 11V17M13 11V17" stroke="#EC221F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown-content">
+                                        <a href="#">Edit User</a>
+                                        <a href="#" class="delete-link" data-name="<%= row.fullName %>" data-email="<%= row.email %>">Delete</a>
+                                    </div>
                                 </div>
-                                <div class="dropdown-content">
-                                    <a href="#">Link 1</a>
-                                    <a href="#">Link 2</a>
-                                    <a href="#" class="delete-link" data-name="<%= row.fullName %>" data-email="<%= row.email %>">Delete</a>
-                                </div>
-                            </div>
-                        </td>
+                            </td>
                     </tr>
                 <% }) %> 
             </table>
         </section>
             <section class="content-section col">
-                <table id="groups" class=" table table-bordered table-hover">
+                <table id="groups" class=" table table-hover">
                     <tr>
                         <th>Full name</th>
                         <th>Email</th>
@@ -90,13 +93,17 @@
                             <td><%= row.email %></td>
                             <td><%= row.GroupName %></td>
                             <td>
-                                <div class="dropdown">
-                                    <div class="menu-btn">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <circle cx="12" cy="6" r="2" fill="#666666"/>
-                                            <circle cx="12" cy="12" r="2" fill="#666666"/>
-                                            <circle cx="12" cy="18" r="2" fill="#666666"/>
-                                        </svg>
+                                    <div class="row justify-content-evenly">
+                                        <div role='button' class="col-1 dropdown">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 21V16.75L16.2 3.575C16.4 3.39167 16.6208 3.25 16.8625 3.15C17.1042 3.05 17.3583 3 17.625 3C17.8917 3 18.15 3.05 18.4 3.15C18.65 3.25 18.8667 3.4 19.05 3.6L20.425 5C20.625 5.18333 20.7708 5.4 20.8625 5.65C20.9542 5.9 21 6.15 21 6.4C21 6.66667 20.9542 6.92083 20.8625 7.1625C20.7708 7.40417 20.625 7.625 20.425 7.825L7.25 21H3ZM17.6 7.8L19 6.4L17.6 5L16.2 6.4L17.6 7.8Z" fill="#1D1B20"/>
+                                            </svg>
+                                        </div>
+                                        <div role='button' class="col-1 delete-link" data-email="<%= row.email %>">
+                                            <svg width="22" height="24" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2 6H4M4 6H20M4 6V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H16C16.5304 22 17.0391 21.7893 17.4142 21.4142C17.7893 21.0391 18 20.5304 18 20V6M7 6V4C7 3.46957 7.21071 2.96086 7.58579 2.58579C7.96086 2.21071 8.46957 2 9 2H13C13.5304 2 14.0391 2.21071 14.4142 2.58579C14.7893 2.96086 15 3.46957 15 4V6M9 11V17M13 11V17" stroke="#EC221F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
                                     </div>
                                     <div class="dropdown-content">
                                         <a href="#">Edit User</a>
@@ -131,172 +138,65 @@
         </div>
     </div>
 
+    <!-- Delete user functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteBtns = document.querySelectorAll('.delete-link');
+            
+            deleteBtns.forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent event bubbling
+                    
+                    // Get the email from data attribute
+                    const email = button.dataset.email;
+                    
+                    if (!email) {
+                        console.error('Email not found in data attributes');
+                        return;
+                    }
+                    
+                    const confirmDelete = confirm(`Are you sure you want to delete user with email: ${email}?`);
+                    
+                    if (confirmDelete) {
+                        try {
+                            const response = await fetch('/delete-user', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ email: email })
+                            });
+                            
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                // Find the closest row and remove it
+                                const row = button.closest('tr');
+                                if (row) {
+                                    row.remove();
+                                    alert('User deleted successfully');
+                                }
+                            } else {
+                                alert('Error: ' + (result.error || 'Failed to delete user'));
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the user');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Handles hiding and showing tables -->
+    <script>
+    
+    </script>
     <!-- Bootstrap JS  -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 
-
-    <script>
-            <!-- Handles bav button opening and closing of the tables -->
-
-    document.addEventListener('DOMContentLoaded', function() {
-    // Toggle functionality
-    const buttons = document.querySelectorAll('.toggle-btn');
-    const contents = document.querySelectorAll('.content-section');
-
-    buttons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove active classes
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
-            this.classList.add('active');
-            
-            // Hide all content sections
-            contents.forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            // Show the targeted content
-            const targetId = this.getAttribute('data-target');
-            const targetContent = document.getElementById(targetId);
-            if (targetContent) {
-                targetContent.style.display = 'block';
-            }
-        });
-    });
-
-    // Rest of your existing event listeners...
-});
-    </script>
-
-    <script> 
-        console.log('Script starting...');
-        
-        let userToDelete = null;
-
-        // Wait for DOM to load
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, setting up event listeners...');
-});  // Added missing parenthesis and semicolon
-
-// Handle delete button clicks
-document.addEventListener('click', function(e) {
-    console.log('Click detected on:', e.target.tagName, e.target.className);
-
-    if (e.target.classList.contains('delete-link')) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        console.log('Delete link clicked!');
-
-        const fullName = e.target.dataset.name;
-        const email = e.target.dataset.email;
-
-        console.log('User data:', { fullName, email });
-
-        const userToDelete = { fullName, email };  // Added missing const
-        document.getElementById('userToDelete').textContent = fullName;
-
-        // Show modal - using the correct ID
-        console.log('Attempting to show modal...');
-        const modalElement = document.getElementById('staticBackdrop');
-        console.log('Modal element found:', modalElement);
-
-        if (modalElement) {
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-            console.log('Modal.show() called');
-        } else {
-            console.error('Modal element not found!');
-        }
-    }  // Added missing closing brace for if statement
-});  // Added missing closing parenthesis and semicolon
-
-// Handle confirm delete
-document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-    console.log('Confirm delete clicked');
-    if (!userToDelete) return;
-
-    try {
-        const response = await fetch('/delete-user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userToDelete)
-        });  // Added missing closing parenthesis and semicolon
-        
-        // Add your response handling code here
-    } catch (error) {
-        console.error('Delete error:', error);
-    }
-});  // Added missing closing parenthesis and semicolon
-            
-            // Handle dropdown menu functionality
-const menuBtns = document.querySelectorAll('.dropdown');
-console.log('Found dropdowns:', menuBtns.length);
-
-menuBtns.forEach(dropdown => {
-    const btn = dropdown.querySelector('.menu-btn');
-    const dropdownContent = dropdown.querySelector('.dropdown-content');
     
-    if (!btn || !dropdownContent) {
-        console.warn('Dropdown missing required elements:', dropdown);
-        return;
-    }
-
-    // Add ARIA attributes for accessibility
-    btn.setAttribute('aria-haspopup', 'true');
-    btn.setAttribute('aria-expanded', 'false');
-    dropdownContent.setAttribute('aria-hidden', 'true');
-
-    btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        console.log('Dropdown menu clicked');
-        
-        // Close all other dropdowns first
-        document.querySelectorAll('.dropdown-content').forEach(content => {
-            if (content !== dropdownContent) {
-                content.style.display = 'none';
-                content.setAttribute('aria-hidden', 'true');
-                content.previousElementSibling?.setAttribute('aria-expanded', 'false');
-            }
-        });
-        
-        // Toggle current dropdown
-        const isOpen = dropdownContent.style.display === 'block';
-        dropdownContent.style.display = isOpen ? 'none' : 'block';
-        dropdownContent.setAttribute('aria-hidden', isOpen ? 'true' : 'false');
-        btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-    });
-
-    // Keyboard navigation support
-    btn.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            btn.click();
-        }
-    });
-});
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
-    // Only close if not clicking on any dropdown-related element
-    if (!e.target.closest('.dropdown')) {
-        document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-            dropdown.style.display = 'none';
-            dropdown.setAttribute('aria-hidden', 'true');
-            dropdown.previousElementSibling?.setAttribute('aria-expanded', 'false');
-        });
-    }
-});
-
-// Prevent dropdown from closing when clicking inside it
-document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-    dropdown.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-});
-
-console.log('All event listeners set up successfully');
-    </script>
 </body>
 </html>

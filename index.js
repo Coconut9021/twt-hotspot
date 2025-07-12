@@ -92,20 +92,33 @@ app.post("/check-admin", async (req, res) => {
 app.post('/delete-user', async (req, res) => {
     try {
         const { email } = req.body;
-        
+
         if (!email) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Email is required' 
+            return res.status(400).json({
+                success: false,
+                error: 'Email is required'
             });
         }
 
         const result = await deleteUser(email);
-        res.json(result);
+        
+        if (result.success) {
+            res.redirect("/admin");
+            res.json({
+                success: true,
+                message: 'User deleted successfully'
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                error: result.error || 'Failed to delete user'
+            });
+        }
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            error: error.message 
+        console.error('Delete user error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Internal server error'
         });
     }
 });

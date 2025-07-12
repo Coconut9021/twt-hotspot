@@ -106,13 +106,10 @@ export async function deleteUser(email) {
         // Delete from all related tables
         await pool.query(`DELETE FROM radcheck WHERE username = ?`, [email]);
         await pool.query(`DELETE FROM radusergroup WHERE UserName = ?`, [email]);
-        const [result] = await pool.query(`DELETE FROM user_profiles WHERE email = ?`, [email]);
-        
-        if (result.affectedRows === 0) {
-            throw new Error('User not found');
-        }
-        
+        await pool.query(`DELETE FROM user_profiles WHERE email = ?`, [email]);
+
         return { success: true, deletedCount: result.affectedRows };
+
     } catch (error) {
         console.error('Error deleting user:', error);
         throw error;
