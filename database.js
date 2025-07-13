@@ -19,6 +19,9 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    radius_secret: process.env.RADIUS_SECRET,
+    radius_port: process.env.RADIUS_PORT,
+    radius_server: process.env.RADIUS_SERVER,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -51,12 +54,12 @@ export function authenticateUser(username, fullName, callback) {
 
   const message = radius.encode({
     code: 'Access-Request',
-    RADIUS_SECRET,
+    radius_secret,
     attributes,
   });
 
   const socket = dgram.createSocket('udp4');
-  socket.send(message, 0, message.length, RADIUS_PORT, RADIUS_SERVER, (err) => {
+  socket.send(message, 0, message.length, radius_port, radius_server, (err) => {
     if (err) return callback(err);
   });
 
