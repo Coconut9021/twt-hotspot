@@ -54,8 +54,8 @@ export function authenticateUser(username, callback) {
     const attributes = [
     [1, Buffer.from(username)], // User-Name
     [2, Buffer.from(password)], // User-Password 
-    [4, Buffer.from('13.245.75.199')], // NAS-IP-Address
-    [5, Buffer.from('NAS-Port')], // NAS-Port
+    [4, Buffer.from('127.0.0.1')], // NAS-IP-Address
+    [5, Buffer.from('0')], // NAS-Port
     [80, Buffer.alloc(16, 0)] // ← Critical: Message-Authenticator (16 zero bytes)
 ];
 
@@ -68,8 +68,8 @@ export function authenticateUser(username, callback) {
 
     const message = radius.encode({
         code: 'Access-Request',
-        secret,
         attributes,
+        secret,
     });
 
     const socket = dgram.createSocket('udp4');
