@@ -24,9 +24,13 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-const radius_secret = process.env.RADIUS_SECRET;
-const radius_port = process.env.RADIUS_PORT;
-const radius_server = process.env.RADIUS_SERVER;
+
+const radiusConfig = {
+    secret: process.env.RADIUS_SECRET,
+    port: process.env.RADIUS_PORT,
+    server: process.env.RADIUS_SERVER,
+};
+
 
 const USER_PASSWORD = process.env.USER_PASSWORD;
 // Export the pool directly 
@@ -45,35 +49,38 @@ export default pool;
 // }
 
 // RADIUS Authentication Functions
-export function authenticateUser(username, fullName, callback) {
-  const attributes = [
-    [1, Buffer.from(username)],  // User-Name
-    [2, Buffer.from(fullName)],  // User-Password
-    [4, Buffer.from('192.168.1.10')], // NAS-IP-Address (your app's IP)
-    [5, Buffer.from('NAS-Port')], // NAS-Port (arbitrary identifier)
-  ];
+export function authenticateUser(username, fullName, callback) {    
+     const { secret, server, port } = radiusConfig;
 
-  const message = radius.encode({
-    code: 'Access-Request',
-    radius_secret,
-    attributes,
-  });
 
-  const socket = dgram.createSocket('udp4');
-  socket.send(message, 0, message.length, radius_port, radius_server, (err) => {
-    if (err) return callback(err);
-  });
+    const attributes = [
+        [1, Buffer.from(username)],  // User-Name
+        [2, Buffer.from(fullName)],  // User-Password
+        [4, Buffer.from('192.168.1.10')], // NAS-IP-Address (your app's IP)
+        [5, Buffer.from('NAS-Port')], // NAS-Port (arbitrary identifier)
+    ];
 
-  socket.on('message', (msg) => {
-    try {
-      const response = radius.decode({ packet: msg, secret });
-      callback(null, response.code === 'Access-Accept');
-    } catch (err) {
-      callback(err);
-    } finally {
-      socket.close();
-    }
-  });
+    const message = radius.encode({
+        code: 'Access-Request',
+        secret,
+        attributes,
+    });
+
+    const socket = dgram.createSocket('udp4');
+    socket.send(message, 0, message.length, port, server, (err) => {
+        if (err) return callback(err);
+    });
+
+    socket.on('message', (msg) => {
+        try {
+            const response = radius.decode({ packet: msg, secret });
+            callback(null, response.code === 'Access-Accept');
+        } catch (err) {
+            callback(err);
+        } finally {
+            socket.close();
+        }
+    });
 }
 
 export async function insertUserData(data) {
