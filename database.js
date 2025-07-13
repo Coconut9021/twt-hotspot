@@ -2,6 +2,7 @@ import mysql from 'mysql2/promise';
 import dotenv from 'dotenv' 
 import dgram from 'dgram';
 import radius from 'radius';
+import { Socket } from 'dgram';
 import { cleanPhoneNumber, scrubCompany } from './utils.js'
 
 dotenv.config();
@@ -52,24 +53,19 @@ export function authenticateUser(username, callback) {
     const { secret, server, port, password } = radiusConfig;
 
     const attributes = [
-    [1, Buffer.from(username)], // User-Name
-    [2, Buffer.from(password)], // User-Password 
-    [4, Buffer.from('127.0.0.1')], // NAS-IP-Address
-    [5, Buffer.from('0')], // NAS-Port
-    [80, Buffer.alloc(16, 0)] // ← Critical: Message-Authenticator (16 zero bytes)
-];
-
-    console.log('=== SECRET VERIFICATION ===');
-    console.log('Type of secret:', typeof secret);
-    console.log('Secret value:', `"${secret}"`);
-    console.log('Secret length:', secret.length);
-    console.log('Hex representation:', Buffer.from(secret).toString('hex'));
-    console.log('==========================');
+        [1, Buffer.from(username)], // User-Name
+        [2, Buffer.from(password)],  // User-Password
+        [4, Buffer.from('13.245.75.199')], // NAS-IP-Address
+        [5, Buffer.from('NAS-Port')],      // NAS-Port
+        [80, Buffer.alloc(16)]             // Message-Authenticator
+    ];
 
     const message = radius.encode({
         code: 'Access-Request',
-        attributes,
         secret,
+        attributes,
+        addMessageAuthenticator: true 
+
     });
 
     const socket = dgram.createSocket('udp4');
@@ -77,6 +73,12 @@ export function authenticateUser(username, callback) {
     socket.on('error', (err) => {
         console.error('Socket error:', err);
         callback(err);
+    });
+
+    socket.setTimeout(5000, () => {
+        console.error('Timeout waiting for RADIUS response');
+        socket.close();
+        callback(new Error('RADIUS server timeout'));
     });
 
     socket.on('message', (msg) => {
