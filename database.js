@@ -58,7 +58,7 @@ export function authenticateUser(username, callback) {
     const attributes = [
         [1, Buffer.from(username)],  // User-Name
         [2, Buffer.from(password)],  // User-Password
-        [4, Buffer.from('192.168.1.10')], // NAS-IP-Address (your app's IP)
+        [4, Buffer.from('13.245.75.199')], // NAS-IP-Address (your app's IP)
         [5, Buffer.from('NAS-Port')], // NAS-Port (arbitrary identifier)
     ];
 
