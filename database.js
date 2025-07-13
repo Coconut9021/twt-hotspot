@@ -19,13 +19,14 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    radius_secret: process.env.RADIUS_SECRET,
-    radius_port: process.env.RADIUS_PORT,
-    radius_server: process.env.RADIUS_SERVER,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
+
+const radius_secret = process.env.RADIUS_SECRET;
+const radius_port = process.env.RADIUS_PORT;
+const radius_server = process.env.RADIUS_SERVER;
 
 const USER_PASSWORD = process.env.USER_PASSWORD;
 // Export the pool directly 
