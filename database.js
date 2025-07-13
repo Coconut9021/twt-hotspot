@@ -51,7 +51,7 @@ export function authenticateUser(username, fullName, callback) {
 
   const message = radius.encode({
     code: 'Access-Request',
-    secret,
+    RADIUS_SECRET,
     attributes,
   });
 
