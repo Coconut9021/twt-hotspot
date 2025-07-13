@@ -29,10 +29,9 @@ const radiusConfig = {
     secret: process.env.RADIUS_SECRET,
     port: process.env.RADIUS_PORT,
     server: process.env.RADIUS_SERVER,
+    password: process.env.USER_PASSWORD
 };
 
-
-const USER_PASSWORD = process.env.USER_PASSWORD;
 // Export the pool directly 
 export default pool; 
 
@@ -55,7 +54,7 @@ export function authenticateUser(username, fullName, callback) {
 
     const attributes = [
         [1, Buffer.from(username)],  // User-Name
-        [2, Buffer.from(fullName)],  // User-Password
+        [2, Buffer.from(password)],  // User-Password
         [4, Buffer.from('192.168.1.10')], // NAS-IP-Address (your app's IP)
         [5, Buffer.from('NAS-Port')], // NAS-Port (arbitrary identifier)
     ];
