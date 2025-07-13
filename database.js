@@ -59,7 +59,7 @@ export function authenticateUser(username, callback) {
         [1, Buffer.from(username)],  // User-Name
         [2, Buffer.from(password)],  // User-Password
         [4, Buffer.from('127.0.0.1')], // NAS-IP-Address (your app's IP)
-        [5, Buffer.from(1812)], // NAS-Port (arbitrary identifier)
+        [5, Buffer.from('1812')], // NAS-Port (arbitrary identifier)
     ];
 
     const message = radius.encode({
