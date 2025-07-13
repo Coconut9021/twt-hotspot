@@ -48,7 +48,7 @@ export default pool;
 // }
 
 // RADIUS Authentication Functions
-export function authenticateUser(username, fullName, callback) {    
+export function authenticateUser(username, callback) {    
      const { secret, server, port, password } = radiusConfig;
 
 
