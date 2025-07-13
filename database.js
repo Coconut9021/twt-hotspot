@@ -29,7 +29,7 @@ const radiusConfig = {
     secret: process.env.RADIUS_SECRET,
     port: process.env.RADIUS_PORT,
     server: process.env.RADIUS_SERVER,
-    // password: process.env.USER_PASSWORD
+    password: process.env.USER_PASSWORD
 };
 
 // Export the pool directly 
