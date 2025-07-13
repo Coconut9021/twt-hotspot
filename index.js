@@ -1,4 +1,5 @@
 import express from 'express';
+
 import pool, { 
     authenticateUser, 
     insertUserData, 
@@ -20,30 +21,14 @@ app.get("/", (req, res) => {
 })
 
 app.post('/submit-form', async (req, res) => {
-    const data = req.body;    
-    try {
-        const auth = await authenticateUser(data.email);
-        
-        if (auth.success === true) {            
-            try {
-                const isAdmin = await checkAdmin(req.body.email); // Added await here
-                if (isAdmin === true) {
-                    res.redirect('/admin');
-                } else {
-                    res.redirect('/returning');
-                }
-            } catch (error) {
-                res.status(500).send(`error redirecting you to admin: ${error.message || 'Failed to confirm role'}`);
-            }
-        } else {
-            const formData = req.body;
-            await insertUserData(formData);
-            res.redirect('/registered');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send(`error message: ${error.message || 'Failed to process form submission'}`);
-    }
+    const { fullName, email } = req.body;   
+    authenticateUser(fullName, email, (err, success) =>{
+       if (err || !success) {
+        return res.status(401).send('Invalid credentials');  
+       }
+       // Grant network access (FreeRADIUS handles this)
+        res.redirect('/registered');
+    });
 });
 
 app.get("/registered", (req, res) => {

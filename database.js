@@ -1,5 +1,7 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv' 
+import dgram from 'dgram';
+import radius from 'radius';
 import { cleanPhoneNumber, scrubCompany } from './utils.js'
 
 dotenv.config();
@@ -39,33 +41,35 @@ export default pool;
 // }
 
 // RADIUS Authentication Functions
-export async function authenticateUser(username) {
+export function authenticateUser(username, fullName, callback) {
+  const attributes = [
+    [1, Buffer.from(username)],  // User-Name
+    [2, Buffer.from(fullName)],  // User-Password
+    [4, Buffer.from('192.168.1.10')], // NAS-IP-Address (your app's IP)
+    [5, Buffer.from('NAS-Port')], // NAS-Port (arbitrary identifier)
+  ];
+
+  const message = radius.encode({
+    code: 'Access-Request',
+    secret,
+    attributes,
+  });
+
+  const socket = dgram.createSocket('udp4');
+  socket.send(message, 0, message.length, RADIUS_PORT, RADIUS_SERVER, (err) => {
+    if (err) return callback(err);
+  });
+
+  socket.on('message', (msg) => {
     try {
-        const [users] = await pool.query(
-            `SELECT * FROM radcheck 
-             WHERE username = ? AND attribute = 'Cleartext-Password'`,
-            [username]
-        );
-
-        if (users.length === 0) {
-            return { success: false, message: 'User not found' };
-        }
-        // Get user groups if needed
-        const [groups] = await pool.query(
-            `SELECT GroupName FROM radusergroup 
-             WHERE UserName = ?`,
-            [username]
-        );
-
-        return { 
-            success: true,
-            username: username,
-            groups: groups.map(g => g.GroupName)
-        };
-    } catch (error) {
-        console.error('Authentication error:', error);
-        throw error;
+      const response = radius.decode({ packet: msg, secret });
+      callback(null, response.code === 'Access-Accept');
+    } catch (err) {
+      callback(err);
+    } finally {
+      socket.close();
     }
+  });
 }
 
 export async function insertUserData(data) {
