@@ -62,12 +62,12 @@ export function authenticateUser(username, callback) {
         [5, Buffer.from('1812')], // NAS-Port (arbitrary identifier)
     ];
 
-    const new_secret = 'testing123'
+    const newsecret = 'testing123'
 
     const message = radius.encode({
         code: 'Access-Request',
         attributes,
-        new_secret,
+        newsecret,
         addMessageAuthenticator: true 
     });
 
