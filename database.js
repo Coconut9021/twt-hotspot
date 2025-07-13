@@ -29,7 +29,7 @@ const radiusConfig = {
     secret: process.env.RADIUS_SECRET,
     port: process.env.RADIUS_PORT,
     server: process.env.RADIUS_SERVER,
-    password: process.env.USER_PASSWORD
+    // password: process.env.USER_PASSWORD
 };
 
 // Export the pool directly 
@@ -49,14 +49,18 @@ export default pool;
 
 // RADIUS Authentication Functions
 export function authenticateUser(username, callback) {    
-     const { secret, server, port, password } = radiusConfig;
-
+    const { secret, server, port, password } = radiusConfig;
+    console.log("radius secret:", secret)
+    console.log("radius server:", server)
+    console.log("radius port:", port)
+    console.log("radius password:", password)
 
     const attributes = [
         [1, Buffer.from(username)],  // User-Name
-        [2, Buffer.from(password)],  // User-Password
-        [4, Buffer.from('192.168.1.10')], // NAS-IP-Address (your app's IP)
-        [5, Buffer.from('NAS-Port')], // NAS-Port (arbitrary identifier)
+        [2, Buffer.from(password)],  // User-Password (must match DB)
+        [4, Buffer.from('172.31.9.60')], // NAS-IP-Address (your server's IP)
+        [5, Buffer.from('0')],       // NAS-Port (use 0 like radtest)
+        [80, Buffer.from([0x00])],   // Message-Authenticator (simplified)
     ];
 
     const message = radius.encode({
