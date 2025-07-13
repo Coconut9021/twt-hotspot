@@ -72,12 +72,6 @@ export function authenticateUser(username, callback) {
         callback(err);
     });
 
-    socket.setTimeout(5000, () => {
-        console.error('Timeout waiting for RADIUS response');
-        socket.close();
-        callback(new Error('RADIUS server timeout'));
-    });
-
     socket.on('message', (msg) => {
         try {
             console.log('Raw RADIUS response:', msg.toString('hex')); // Log raw response
