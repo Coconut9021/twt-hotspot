@@ -24,7 +24,8 @@ app.post('/submit-form', async (req, res) => {
     const { email } = req.body;   
     authenticateUser(email, (err, success) =>{
        if (err || !success) {
-        return res.status(401).send('Invalid credentials');  
+        console.log(err) 
+        return res.status(401).send('Invalid credentials'); 
        }
        // Grant network access (FreeRADIUS handles this)
         res.redirect('/registered');
