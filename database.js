@@ -59,6 +59,13 @@ export function authenticateUser(username, callback) {
     [80, Buffer.alloc(16, 0)] // ← Critical: Message-Authenticator (16 zero bytes)
 ];
 
+    console.log('=== SECRET VERIFICATION ===');
+    console.log('Type of secret:', typeof secret);
+    console.log('Secret value:', `"${secret}"`);
+    console.log('Secret length:', secret.length);
+    console.log('Hex representation:', Buffer.from(secret).toString('hex'));
+    console.log('==========================');
+
     const message = radius.encode({
         code: 'Access-Request',
         secret,
