@@ -52,12 +52,12 @@ export function authenticateUser(username, callback) {
     const { secret, server, port, password } = radiusConfig;
 
     const attributes = [
-        [1, Buffer.from(username)], // User-Name
-        [2, Buffer.from(password)],  // User-Password
-        [4, Buffer.from('13.245.75.199')], // NAS-IP-Address
-        [5, Buffer.from('NAS-Port')],      // NAS-Port
-        [80, Buffer.alloc(16)]             // Message-Authenticator
-    ];
+    [1, Buffer.from(username)], // User-Name
+    [2, Buffer.from(password)], // User-Password 
+    [4, Buffer.from('13.245.75.199')], // NAS-IP-Address
+    [5, Buffer.from('NAS-Port')], // NAS-Port
+    [80, Buffer.alloc(16, 0)] // ← Critical: Message-Authenticator (16 zero bytes)
+];
 
     const message = radius.encode({
         code: 'Access-Request',
