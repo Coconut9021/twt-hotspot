@@ -2,7 +2,6 @@ import mysql from 'mysql2/promise';
 import dotenv from 'dotenv' 
 import dgram from 'dgram';
 import radius from 'radius';
-import { Socket } from 'dgram';
 import { cleanPhoneNumber, scrubCompany } from './utils.js'
 
 dotenv.config();
@@ -49,15 +48,18 @@ export default pool;
 // }
 
 // RADIUS Authentication Functions
-export function authenticateUser(username, callback) {
+export function authenticateUser(username, callback) {    
     const { secret, server, port, password } = radiusConfig;
+    console.log("radius secret:", secret)
+    console.log("radius server:", server)
+    console.log("radius port:", port)
+    console.log("radius password:", password)
 
     const attributes = [
-        [1, Buffer.from(username)], // User-Name
+        [1, Buffer.from(username)],  // User-Name
         [2, Buffer.from(password)],  // User-Password
-        [4, Buffer.from('13.245.75.199')], // NAS-IP-Address
-        [5, Buffer.from('NAS-Port')],      // NAS-Port
-        [80, Buffer.alloc(16)]             // Message-Authenticator
+        [4, Buffer.from('13.245.75.199')], // NAS-IP-Address (your app's IP)
+        [5, Buffer.from('NAS-Port')], // NAS-Port (arbitrary identifier)
     ];
 
     const message = radius.encode({
@@ -65,42 +67,21 @@ export function authenticateUser(username, callback) {
         secret,
         attributes,
         addMessageAuthenticator: true 
-
     });
 
     const socket = dgram.createSocket('udp4');
-
-    socket.on('error', (err) => {
-        console.error('Socket error:', err);
-        callback(err);
-    });
-
-    socket.setTimeout(5000, () => {
-        console.error('Timeout waiting for RADIUS response');
-        socket.close();
-        callback(new Error('RADIUS server timeout'));
+    socket.send(message, 0, message.length, port, server, (err) => {
+        if (err) return callback(err);
     });
 
     socket.on('message', (msg) => {
         try {
-            console.log('Raw RADIUS response:', msg.toString('hex')); // Log raw response
             const response = radius.decode({ packet: msg, secret });
-            console.log('Decoded response:', response); // Log full response
             callback(null, response.code === 'Access-Accept');
         } catch (err) {
-            console.error('Decode error:', err);
             callback(err);
         } finally {
             socket.close();
-        }
-    });
-
-    console.log('Sending RADIUS request for user:', username);
-    socket.send(message, 0, message.length, port, server, (err) => {
-        if (err) {
-            console.error('Send error:', err);
-            socket.close();
-            return callback(err);
         }
     });
 }
