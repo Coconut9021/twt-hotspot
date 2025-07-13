@@ -21,8 +21,8 @@ app.get("/", (req, res) => {
 })
 
 app.post('/submit-form', async (req, res) => {
-    const { fullName, email } = req.body;   
-    authenticateUser(fullName, email, (err, success) =>{
+    const { email } = req.body;   
+    authenticateUser(email, (err, success) =>{
        if (err || !success) {
         return res.status(401).send('Invalid credentials');  
        }

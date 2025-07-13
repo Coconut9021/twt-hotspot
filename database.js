@@ -49,7 +49,7 @@ export default pool;
 
 // RADIUS Authentication Functions
 export function authenticateUser(username, fullName, callback) {    
-     const { secret, server, port } = radiusConfig;
+     const { secret, server, port, password } = radiusConfig;
 
 
     const attributes = [
