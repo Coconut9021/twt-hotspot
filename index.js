@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
-app.get("/", (req, res) => {
+app.post("/", (req, res) => {
   res.render("index.ejs");
 })
 
@@ -32,7 +32,7 @@ app.post('/submit-form', async (req, res) => {
     });
 });
 
-app.get("/registered", (req, res) => {
+app.post("/registered", (req, res) => {
     try {
         res.render('registered.ejs');
 
@@ -44,7 +44,7 @@ app.get("/registered", (req, res) => {
     }
 }) 
 
-app.get("/returning", (req, res) => {
+app.post("/returning", (req, res) => {
     try {
         res.render('returning.ejs');
 
@@ -55,7 +55,7 @@ app.get("/returning", (req, res) => {
         })
     }
 }) 
-app.get("/admin", async (req, res) => {
+app.post("/admin", async (req, res) => {
     try {
         const { fullData, groups } = await showDatabase();
         res.render("admin.ejs", { 
