@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
-app.post("/", (req, res) => {
+app.post("/login", (req, res) => {
   res.render("index.ejs");
 })
 
@@ -30,7 +30,7 @@ app.post('/submit-form', async (req, res) => {
     //    // Grant network access (FreeRADIUS handles this)
     //     res.redirect('/registered');
     // });
-    res.redirect('/registered');
+    res.redirect('/')
 });
 
 app.post("/registered", (req, res) => {
