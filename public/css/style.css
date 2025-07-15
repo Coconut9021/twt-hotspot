@@ -98,10 +98,10 @@
         input[type="email"],
         input[type="tel"] {
             width: 100%;
-            padding: 15px;
+            padding: 0.275rem;
             border: 2px solid #e1e8ed;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 1rem;
             transition: all 0.3s ease;
             background: #f8f9fa;
         }
