@@ -21,15 +21,16 @@ app.post("/", (req, res) => {
 })
 
 app.post('/submit-form', async (req, res) => {
-    const { email } = req.body;   
-    authenticateUser(email, (err, success) =>{
-       if (err || !success) {
-        console.log(err) 
-        return res.status(401).send('Invalid credentials'); 
-       }
-       // Grant network access (FreeRADIUS handles this)
-        res.redirect('/registered');
-    });
+    // const { email } = req.body;   
+    // authenticateUser(email, (err, success) =>{
+    //    if (err || !success) {
+    //     console.log(err) 
+    //     return res.status(401).send('Invalid credentials'); 
+    //    }
+    //    // Grant network access (FreeRADIUS handles this)
+    //     res.redirect('/registered');
+    // });
+    res.redirect('/registered');
 });
 
 app.post("/registered", (req, res) => {
