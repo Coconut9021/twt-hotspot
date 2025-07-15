@@ -15,6 +15,12 @@
             padding: 20px;
         }
 
+        form{
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+        }
+
         .container {
             background: rgba(255, 255, 255, .50);
             backdrop-filter: blur(10px);
@@ -86,7 +92,7 @@
         label {
             display: block;
             color: #333;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
             font-size: 14px;
         }
@@ -104,7 +110,7 @@
             border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.5);;
         }
 
         input[type="text"]:focus,
@@ -112,7 +118,7 @@
         input[type="tel"]:focus {
             outline: none;
             border-color: #ff0000;
-            background: white;
+            background: rgba(255, 255, 255, 0.8);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
         }
@@ -134,6 +140,7 @@
         .checkbox-group label {
             margin-bottom: 0;
             font-size: 14px;
+            font-weight: 600;
             line-height: 1.5;
             flex: 1;
         }
@@ -148,7 +155,7 @@
         }
 
         .submit-btn {
-            width: 100%;
+            width: 60%;
             background: linear-gradient(135deg, #ff0000, #ff1100);
             color: white;
             border: none;
@@ -160,6 +167,7 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin: 0 auto;
         }
 
         .submit-btn:hover {
