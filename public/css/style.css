@@ -6,9 +6,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ff5500;
-            background: linear-gradient(145deg, rgba(255, 85, 0, 1) 0%, rgba(255, 0, 0, 1) 100%);            min-height: 100vh;
-            display: flex;
+            background: #FF0000;
+            background: radial-gradient(circle,rgba(255, 0, 0, 1) 0%, rgba(255, 85, 0, 1) 100%);            display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
