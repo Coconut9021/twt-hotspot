@@ -51,27 +51,25 @@ export default pool;
 // RADIUS Authentication Functions
 export async function authenticateUser(username) {
     try {
-        const [checkRadCheck] = await pool.query('SELECT username FROM radcheck WHERE username = ?', [username]);
+        const [checkRadCheck] = await pool.query(
+            'SELECT username FROM radcheck WHERE username = ?', 
+            [username]
+        );
         
-        // Check if any results were returned
         if (checkRadCheck.length === 0) {
             console.log("No user found with username:", username);
-            return false; // or throw an error if you prefer
+            return false;
         }
-
-        // Access the first row (object) in the result
+        
         const firstRow = checkRadCheck[0];
-        
-        // Access the username property from the first row
         const dbusername = firstRow.username;
-        
         console.log("Found username:", dbusername);
         return true;
     } catch (err) {
         console.error("Error authenticating user:", err.message);
-        throw err; // or return null if you prefer silent handling
+        throw err;
     }
-}
+}s
 
 export async function insertUserData(data) {
     console.log(data)
