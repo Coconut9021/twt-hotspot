@@ -48,46 +48,33 @@ export default pool;
 // }
 
 // RADIUS Authentication Functions
-export function authenticateUser(username, callback) {    
-    const { secret, server, port, password } = radiusConfig;
-    console.log("radius secret:", secret)
-    console.log("radius server:", server)
-    console.log("radius port:", port)
-    console.log("radius password:", password)
-
-    const attributes = [
-        [1, Buffer.from(username)],  // User-Name
-        [2, Buffer.from(password)],  // User-Password
-        [4, Buffer.from('127.0.0.1')], // NAS-IP-Address (your app's IP)
-        [5, Buffer.from('1812')], // NAS-Port (arbitrary identifier)
-    ];
-
-
-    const message = radius.encode({
-        code: 'Access-Request',
-        attributes,
-        secret,
-        addMessageAuthenticator: true 
-    });
-
-    const socket = dgram.createSocket('udp4');
-    socket.send(message, 0, message.length, port, server, (err) => {
-        if (err) return callback(err);
-    });
-
-    socket.on('message', (msg) => {
-        try {
-            const response = radius.decode({ packet: msg, secret });
-            callback(null, response.code === 'Access-Accept');
-        } catch (err) {
-            callback(err);
-        } finally {
-            socket.close();
+// RADIUS Authentication Functions
+export async function authenticateUser(username) {
+    try {
+        const [checkRadCheck] = await pool.query('SELECT username FROM radcheck WHERE username = ?', [username]);
+        
+        // Check if any results were returned
+        if (checkRadCheck.length === 0) {
+            console.log("No user found with username:", username);
+            return false; // or throw an error if you prefer
         }
-    });
+
+        // Access the first row (object) in the result
+        const firstRow = checkRadCheck[0];
+        
+        // Access the username property from the first row
+        const dbusername = firstRow.username;
+        
+        console.log("Found username:", dbusername);
+        return true;
+    } catch (err) {
+        console.error("Error authenticating user:", err.message);
+        throw err; // or return null if you prefer silent handling
+    }
 }
 
 export async function insertUserData(data) {
+    console.log(data)
     try {
         if (!data.email || !data.fullName || !data.terms) {
             throw new Error('Missing required fields');
@@ -98,7 +85,7 @@ export async function insertUserData(data) {
             INSERT INTO radcheck 
             (username, attribute, op, value)
             VALUES (?, 'Cleartext-Password', ':=', ?)
-        `, [data.email, USER_PASSWORD]);
+        `, [data.email, radiusConfig.password]);
 
         // Insert into user profile table 
         await pool.query(`

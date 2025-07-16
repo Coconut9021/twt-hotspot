@@ -20,18 +20,34 @@ app.post("/", (req, res) => {
   res.render("index.ejs");
 })
 
-app.post('/submit-form', async (req, res) => {
-    // const { email } = req.body;   
-    // authenticateUser(email, (err, success) =>{
-    //    if (err || !success) {
-    //     console.log(err) 
-    //     return res.status(401).send('Invalid credentials'); 
-    //    }
-    //    // Grant network access (FreeRADIUS handles this)
-    //     res.redirect('/registered');
-    // });
-    res.redirect('/')
-});
+app.post("/login", async (req, res) => {
+    const data  = req.body
+    const email = data.email
+    const authStatus = await authenticateUser(email)
+    console.log(authStatus)
+    if (authStatus == true) {
+        res.render('alogin.ejs', {
+            email
+        })    
+    } else {
+        insertUserData(data);
+        res.render('alogin.ejs', {
+            email
+        })
+    }
+})
+
+app.post("/alogin", (req, res) => {
+    try {
+        res.render('alogin.ejs');
+
+    } catch (error) {
+        console.error('Error loading the redirect page:', error)
+        res.status(500).send('error rendering page', {
+            message: 'Failed to load redirect page'
+        })
+    }
+})
 
 app.post("/registered", (req, res) => {
     try {
