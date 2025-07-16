@@ -173,23 +173,26 @@
                     <div>
                         <input type="text" name="fullName" id="fullname" class=""> 
                     </div>
+                    <div class="error" id="termsError">Full Name is required</div>
                 </div>
                 <div class="form-group">
                     <label for="email" class="">Email</label>
                     <div class="">
                         <input type="text" name="email" id="username" class="5" value="">
                     </div>
+                    <div class="error" id="termsError">Valid email is required</div>
                 </div>
                 <div class="form-group">
                     <label class="">Phone Number</label>
                     <div>
                         <input type="text" name="phone" id="phonenumber" class="">
                     </div>
+                    <div class="error" id="termsError">Valid phone number is required</div>
                 </div>
                 <div class="form-group">
                     <label class="">Company Name</label>
                     <div>
-                        <input type="text" name="company" id="company" class="" placeholder="The company you for if applicable">
+                        <input type="text" name="company" id="company" class="" >
                     </div>
                 </div>
                     <div class="checkbox-group">
@@ -219,105 +222,121 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        const termsError = document.getElementById('termsError');
+    const form = document.querySelector('form');
+    
+    // Get all error message elements
+    const errorMessages = {
+        fullName: document.querySelector('#fullname').nextElementSibling.nextElementSibling,
+        email: document.querySelector('#username').nextElementSibling.nextElementSibling,
+        phone: document.querySelector('#phonenumber').nextElementSibling.nextElementSibling,
+        terms: document.getElementById('terms').parentElement.nextElementSibling
+    };
+    
+    // Hide all error messages initially
+    Object.values(errorMessages).forEach(error => {
+        if (error) error.style.display = 'none';
+    });
+    
+    form.addEventListener('submit', function(event) {
+        let isValid = true;
         
-        // Hide error message initially
-        termsError.style.display = 'none';
-        
-        form.addEventListener('submit', function(event) {
-            let isValid = true;
-            
-            // Validate Full Name
-            const fullName = document.getElementById('fullname');
-            if (!fullName.value.trim()) {
-                isValid = false;
-                highlightError(fullName);
-            } else {
-                removeHighlight(fullName);
-            }
-            
-            // Validate Email
-            const email = document.getElementById('username');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.value.trim())) {
-                isValid = false;
-                highlightError(email);
-            } else {
-                removeHighlight(email);
-            }
-            
-            // Validate Phone Number (basic validation)
-            const phone = document.getElementById('phonenumber');
-            const phoneRegex = /^[\d\s\-+()]{8,}$/; // Basic phone number pattern
-            if (!phoneRegex.test(phone.value.trim())) {
-                isValid = false;
-                highlightError(phone);
-            } else {
-                removeHighlight(phone);
-            }
-            
-            // Company is optional, so no validation needed
-            
-            // Validate Terms checkbox
-            const terms = document.getElementById('terms');
-            if (!terms.checked) {
-                isValid = false;
-                termsError.style.display = 'block';
-            } else {
-                termsError.style.display = 'none';
-            }
-            
-            if (!isValid) {
-                event.preventDefault();
-            }
-        });
-        
-        // Helper functions
-        function highlightError(element) {
-            element.style.border = '1px solid red';
-            element.style.backgroundColor = '#fff0f0';
+        // Validate Full Name
+        const fullName = document.getElementById('fullname');
+        if (!fullName.value.trim()) {
+            isValid = false;
+            highlightError(fullName);
+            errorMessages.fullName.style.display = 'block';
+        } else {
+            removeHighlight(fullName);
+            errorMessages.fullName.style.display = 'none';
         }
         
-        function removeHighlight(element) {
-            element.style.border = '';
-            element.style.backgroundColor = '';
+        // Validate Email
+        const email = document.getElementById('username');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value.trim())) {
+            isValid = false;
+            highlightError(email);
+            errorMessages.email.style.display = 'block';
+        } else {
+            removeHighlight(email);
+            errorMessages.email.style.display = 'none';
         }
         
-        // Add real-time validation for better UX
-        document.getElementById('fullname').addEventListener('blur', validateName);
-        document.getElementById('username').addEventListener('blur', validateEmail);
-        document.getElementById('phonenumber').addEventListener('blur', validatePhone);
-        
-        function validateName() {
-            const fullName = document.getElementById('fullname');
-            if (!fullName.value.trim()) {
-                highlightError(fullName);
-            } else {
-                removeHighlight(fullName);
-            }
+        // Validate Phone Number
+        const phone = document.getElementById('phonenumber');
+        const phoneRegex = /^[\d\s\-+()]{8,}$/;
+        if (!phoneRegex.test(phone.value.trim())) {
+            isValid = false;
+            highlightError(phone);
+            errorMessages.phone.style.display = 'block';
+        } else {
+            removeHighlight(phone);
+            errorMessages.phone.style.display = 'none';
         }
         
-        function validateEmail() {
-            const email = document.getElementById('username');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.value.trim())) {
-                highlightError(email);
-            } else {
-                removeHighlight(email);
-            }
+        // Validate Terms checkbox
+        const terms = document.getElementById('terms');
+        if (!terms.checked) {
+            isValid = false;
+            errorMessages.terms.style.display = 'block';
+        } else {
+            errorMessages.terms.style.display = 'none';
         }
         
-        function validatePhone() {
-            const phone = document.getElementById('phonenumber');
-            const phoneRegex = /^[\d\s\-+()]{8,}$/;
-            if (!phoneRegex.test(phone.value.trim())) {
-                highlightError(phone);
-            } else {
-                removeHighlight(phone);
-            }
+        if (!isValid) {
+            event.preventDefault();
         }
     });
+    
+    // Helper functions
+    function highlightError(element) {
+        element.style.border = '1px solid red';
+        element.style.backgroundColor = '#fff0f0';
+    }
+    
+    function removeHighlight(element) {
+        element.style.border = '';
+        element.style.backgroundColor = '';
+    }
+    
+    // Add real-time validation for better UX
+    document.getElementById('fullname').addEventListener('blur', validateName);
+    document.getElementById('username').addEventListener('blur', validateEmail);
+    document.getElementById('phonenumber').addEventListener('blur', validatePhone);
+    
+    function validateName() {
+        const fullName = document.getElementById('fullname');
+        if (!fullName.value.trim()) {
+            highlightError(fullName);
+        } else {
+            removeHighlight(fullName);
+            errorMessages.fullName.style.display = 'none';
+        }
+    }
+    
+    function validateEmail() {
+        const email = document.getElementById('username');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value.trim())) {
+            highlightError(email);
+        } else {
+            removeHighlight(email);
+            errorMessages.email.style.display = 'none';
+        }
+    }
+    
+    function validatePhone() {
+        const phone = document.getElementById('phonenumber');
+        const phoneRegex = /^[\d\s\-+()]{8,}$/;
+        if (!phoneRegex.test(phone.value.trim())) {
+            highlightError(phone);
+        } else {
+            removeHighlight(phone);
+            errorMessages.phone.style.display = 'none';
+        }
+    }
+});
     </script>
 </body>
 
