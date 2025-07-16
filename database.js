@@ -69,7 +69,7 @@ export async function authenticateUser(username) {
         console.error("Error authenticating user:", err.message);
         throw err;
     }
-}s
+}
 
 export async function insertUserData(data) {
     console.log(data)
