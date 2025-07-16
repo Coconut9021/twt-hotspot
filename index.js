@@ -24,7 +24,6 @@ app.post("/login", async (req, res) => {
     const data  = req.body
     const email = data.email
     const authStatus = await authenticateUser(email)
-    console.log(authStatus)
     if (authStatus == true) {
         res.render('alogin.ejs', {
             email

@@ -57,13 +57,11 @@ export async function authenticateUser(username) {
         );
         
         if (checkRadCheck.length === 0) {
-            console.log("No user found with username:", username);
             return false;
         }
         
         const firstRow = checkRadCheck[0];
         const dbusername = firstRow.username;
-        console.log("Found username:", dbusername);
         return true;
     } catch (err) {
         console.error("Error authenticating user:", err.message);
