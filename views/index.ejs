@@ -159,69 +159,66 @@
            -->
 
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?familrequiredy=Forum&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-        <script src="js/jquery.js"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/style.css">
+
     <title>Login</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            background-color: #F7F7F7;
-        }
-    </style>
-
-<body>
-        <div class="md:h-screen w-full md:mt-0 mt-4 flex flex-col justify-center items-center">
-            
-        <form action="http://192.168.5.1/login" method="POST" class="md:w-1/2 w-11/12 space-y-4 pt-2">
-            <div>
-                <label>Full Name</label>
-                <div>
-                    <input type="text" name="fullname" id="fullname" class=""> 
+<body>      
+        <div class="container">
+            <form action="http://192.168.5.1/login" method="POST" class="">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div>
+                        <input type="text" name="fullname" id="fullname" class=""> 
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label for="email" class="">Email</label>
-                <div class="">
-                    <input type="text" name="username" id="username" class="5" value="davidg@geenet.co.zw">
+                <div class="form-group">
+                    <label for="email" class="">Email</label>
+                    <div class="">
+                        <input type="text" name="username" id="username" class="5" value="davidg@geenet.co.zw">
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label class="">Phone Number</label>
-                <div>
-                    <input type="text" name="phonenumber" id="phonenumber" class="">
+                <div class="form-group">
+                    <label class="">Phone Number</label>
+                    <div>
+                        <input type="text" name="phonenumber" id="phonenumber" class="">
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label class="">Company Name</label>
-                <div>
-                    <input type="text" name="phonenumber" id="phonenumber" class="" placeholder="The company you for if applicable">
+                <div class="form-group">
+                    <label class="">Company Name</label>
+                    <div>
+                        <input type="text" name="phonenumber" id="phonenumber" class="" placeholder="The company you for if applicable">
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label for="email" class="">Password</label>
-                <div class="">
-                    <input type="password" name="password" id="password" class="" placeholder="*********" value="Password1234">
+                <div class="form-group">
+                    <div>
+                        <label for="email" class="">Password</label>
+                        <div class="">
+                            <input type="password" name="password" id="password" class="" placeholder="*********" value="Password1234">
+                        </div>
+                        <div class="">
+                            <input onclick="showPassword()" type="checkbox">
+                            <p class="text-sm">Show Password</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="">
-                <input onclick="showPassword()" type="checkbox">
-                <p class="text-sm">Show Password</p>
-            </div>
-            <button type="submit" name="login" class="">Login</button>
-        </form>  
+                    <div class="checkbox-group">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and Wi-Fi usage policy <span class="required">*</span></label>
+                </div>
+                <div class="error" id="termsError">You must agree to the Terms of Service</div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="marketing" name="marketing">
+                    <label for="marketing">I would like to receive promotional emails and offers (optional)</label>
+                </div>
+                <button type="submit" name="login" class="">Login</button>
+            </form>  
+        </div>
+        
         
     <script>
         function showPassword() {
