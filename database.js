@@ -87,7 +87,7 @@ export async function insertUserData(data) {
 
         // Insert into user profile table 
         await pool.query(`
-            INSERT INTO user_profiles 
+            INSERT INTO users 
             (email, fullName, phone, company, terms, marketing)
             VALUES (?, ?, ?, ?, ?, ?)
         `, [data.email, data.fullName, data.phone, data.company, data.terms, data.marketing]);
@@ -110,7 +110,7 @@ export async function deleteUser(email) {
         // Delete from all related tables
         await pool.query(`DELETE FROM radcheck WHERE username = ?`, [email]);
         await pool.query(`DELETE FROM radusergroup WHERE UserName = ?`, [email]);
-        await pool.query(`DELETE FROM user_profiles WHERE email = ?`, [email]);
+        await pool.query(`DELETE FROM users WHERE email = ?`, [email]);
 
         return { success: true, deletedCount: result.affectedRows };
 
@@ -124,13 +124,13 @@ export async function deleteUser(email) {
 export async function showDatabase() {
     try {
         // Get all user profiles
-        const [fullData] = await pool.query('SELECT * FROM user_profiles');
+        const [fullData] = await pool.query('SELECT * FROM users');
         
         // Get user groups with their full names
         const [groups] = await pool.query(`
             SELECT rg.UserName as email, rg.GroupName, up.fullName
             FROM radusergroup rg
-            LEFT JOIN user_profiles up ON rg.UserName = up.email
+            LEFT JOIN users up ON rg.UserName = up.email
         `);
         
         return { fullData, groups };
