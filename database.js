@@ -155,7 +155,7 @@ export async function showDatabase() {
         `);
 
         const [dataUsage] = await pool.query(`
-            SELECT username, acctinputoctets, acctoutputoctets FROM radacct 
+            SELECT username, framedipaddress, acctinputoctets, acctoutputoctets FROM radacct 
             `);
         
         return { fullData, groups, dataUsage };
