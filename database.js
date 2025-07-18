@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv' 
 import dgram from 'dgram';
-import radius from 'radius';
+import bcrypt from 'bcrypt'
 import { cleanPhoneNumber, scrubCompany } from './utils.js'
 
 dotenv.config();
@@ -69,6 +69,28 @@ export async function authenticateUser(username) {
     }
 }
 
+
+export async function authenticateAdmin(username, password) {
+    try {
+        const [rows] = await pool.query(
+            'SELECT password_hash FROM admins WHERE username = ?',
+            [username]
+        );
+        
+        if (rows.length === 0) {
+            return false; // No user found
+        }
+        
+        const hash = rows[0].password_hash; // Access the hash from the first row           
+        const isMatch = await bcrypt.compare(password, hash);
+        
+        return isMatch;
+    } catch (error) {
+        console.error("Error authenticating the role of users:", error.message);
+        throw error;
+    }
+}
+
 export async function insertUserData(data) {
     console.log(data)
     try {
@@ -110,7 +132,7 @@ export async function deleteUser(email) {
         await pool.query(`DELETE FROM radusergroup WHERE UserName = ?`, [email]);
         await pool.query(`DELETE FROM users WHERE email = ?`, [email]);
 
-        return { success: true, deletedCount: result.affectedRows };
+        return { success: true};
 
     } catch (error) {
         console.error('Error deleting user:', error);

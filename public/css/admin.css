@@ -1,105 +1,89 @@
-:root {
-  /* font-colors */
-  --dark-gray: #333;
-  --background-color: #AEAEAE;
-
-  /* font-weights */
-  --font-weight-normal: 400;
-  --font-weight-bold: 600;
-}
-
-* {
-  margin: 0!important; 
-  padding: 0!important;
-  box-sizing: border-box!important;
-}
-
-#navbar {
-  max-width: 100px!important;
-}
-
-table {
-  width: 100%;
-  border-radius: 15px;
-}
-
-section {
-  padding: 20px!important;
-  margin: 20px!important;
-  box-shadow: 0 2px 10px  rgba(0, 0, 0, 0.8);
-  border-radius: 15px;
-
-}
-
-#clients td, #customers th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-#cusclientstomers tr:nth-child(even){background-color: #f2f2f2;}
-
-#clients tr:hover {background-color: #ddd;}
-
-#clients th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #ddd;
-  color: white;
-}
-
-#clients tr th {
-  color: var(--dark-gray);
-  text-align: center;
-  font-weight: var(--font-weight-bold);
-}
-
-.menu-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu-btn:hover {
-  background-color: #b8b8b8;
-}
-
-.dropbtn {
-  background-color: #4CAF50;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  right: 0;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {
-  background-color: #f1f1f1
-}
-
-.dropdown-content a:last-child {
-  color: red;
-  font-weight: bold;
-}
+body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #navbar {
+            background: linear-gradient(180deg, #2c3e50, #1a2530);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.2);
+        }
+        .nav-links {
+            filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%);
+            width: 28px;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn:hover, .toggle-btn.active {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+        .toggle-btn.active .nav-links {
+            filter: invert(75%) sepia(61%) saturate(4600%) hue-rotate(200deg) brightness(95%) contrast(85%);
+        }
+        .content-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .content-section.active {
+            display: block;
+            opacity: 1;
+        }
+        .table th {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: 500;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(44, 62, 80, 0.05);
+        }
+        .action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .edit-btn {
+            background: rgba(41, 128, 185, 0.1);
+            color: #2980b9;
+        }
+        .edit-btn:hover {
+            background: rgba(41, 128, 185, 0.2);
+        }
+        .delete-btn {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        .delete-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        .welcome-section {
+            background: linear-gradient(135deg, #ff0000, #ff5500);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status-admin {
+            background: rgba(41, 128, 185, 0.15);
+            color: #2980b9;
+        }
+        .status-user {
+            background: rgba(46, 204, 113, 0.15);
+            color: #27ae60;
+        }

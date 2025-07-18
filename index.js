@@ -2,6 +2,7 @@ import express from 'express';
 
 import pool, { 
     authenticateUser, 
+    authenticateAdmin,
     insertUserData, 
     deleteUser,
     showDatabase,
@@ -34,7 +35,11 @@ app.post("/login", async (req, res) => {
             email
         })
     }
-})
+});
+
+app.post("/logout", async (req, res) => {
+    
+});
 
 app.post("/alogin", (req, res) => {
     try {
@@ -47,6 +52,57 @@ app.post("/alogin", (req, res) => {
         })
     }
 })
+
+app.get("/admin", (req, res) => {
+    res.render("admin.ejs");
+});
+
+app.post("/admin", async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                error: "Username and password are required"
+            });
+        }
+
+        const isAuthenticated = await authenticateAdmin(username, password);
+
+        if (isAuthenticated) {
+            return res.json({
+                success: true,
+                redirect: '/admin/dashboard'
+            });
+        }
+
+        return res.status(401).json({
+            success: false,
+            error: "Invalid credentials"
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            error: 'Server error'
+        });
+    }
+});
+
+// Add this GET route for the dashboard
+app.get("/admin/dashboard", async (req, res) => {
+    try {
+        const { fullData, groups } = await showDatabase();
+        res.render("dashboard.ejs", {
+            fullData,
+            groups
+        });
+    } catch (error) {
+        console.error('Error loading admin page:', error);
+        res.status(500).send('Server Error');
+    }
+});
 
 app.post("/registered", (req, res) => {
     try {
@@ -71,20 +127,6 @@ app.post("/returning", (req, res) => {
         })
     }
 }) 
-app.post("/admin", async (req, res) => {
-    try {
-        const { fullData, groups } = await showDatabase();
-        res.render("admin.ejs", { 
-            fullData, 
-            groups 
-        });
-    } catch (error) {
-        console.error('Error loading admin page:', error);
-        res.status(500).send('error confirming role',{ 
-            message: 'Failed to load admin data' 
-        });
-    }
-});
 
 app.post("/check-admin", async (req, res) => {
     
@@ -105,7 +147,7 @@ app.post('/delete-user', async (req, res) => {
         const result = await deleteUser(email);
         
         if (result.success) {
-            res.redirect("/admin");
+            res.render("admin.ejs");
             res.json({
                 success: true,
                 message: 'User deleted successfully'
