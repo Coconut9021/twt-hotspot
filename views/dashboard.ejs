@@ -16,9 +16,7 @@
             <section id="navbar" class="col-md-2 d-flex flex-column justify-content-between p-4">
                 <div>
                     <div class="navbar-brand text-center mb-5">
-                        <div class="bg-white p-3 rounded-rectangle d-inline-block">
-                            <img class="navbar-brand" src="/logo.svg" width="100px">
-                        </div>
+                        <img class="navbar-brand" src="/logo.svg" width="100px">
                     </div>
                     <div class="d-grid gap-3">
                         <a class="btn toggle-btn active" data-target="overview-section">
@@ -58,8 +56,8 @@
                 <section id="overview-section" class="content-section active">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3><i class="fas fa-table me-2 text-primary"></i>Customer Data</h3>
-                        <button class="btn btn-primary">
-                            <i class=""></i> Export
+                        <button class="btn btn-info text-white">
+                            <i class="fas fa-download me-2"></i> Export
                         </button>
                     </div>
                     <div class="table-responsive">
@@ -109,17 +107,106 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3><i class="fas fa-users me-2 text-info"></i> User Groups</h3>
                         <button class="btn btn-info text-white">
-                            <i class="fas fa-plus me-2"></i> Create Group
+                            <i class="fas fa-download me-2"></i> Export
                         </button>
                     </div>
                     <div class="table-responsive">
                         <table id="groups" class=" table table-hover">
-                    <tr>
-                        <th>Full name</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
+                        <tr>
+                            <th>Full name</th>
+                            <th>mail</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    <% groups.forEach((row, index) => { %>
+                        <tr>
+                            <td><%= row.fullName %></td>
+                            <td><%= row.email %></td>
+                            <td><%= row.GroupName %></td>
+                            <td>
+                                    <div class="row justify-content-evenly">
+                                        <div role='button' class="col-1 dropdown">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 21V16.75L16.2 3.575C16.4 3.39167 16.6208 3.25 16.8625 3.15C17.1042 3.05 17.3583 3 17.625 3C17.8917 3 18.15 3.05 18.4 3.15C18.65 3.25 18.8667 3.4 19.05 3.6L20.425 5C20.625 5.18333 20.7708 5.4 20.8625 5.65C20.9542 5.9 21 6.15 21 6.4C21 6.66667 20.9542 6.92083 20.8625 7.1625C20.7708 7.40417 20.625 7.625 20.425 7.825L7.25 21H3ZM17.6 7.8L19 6.4L17.6 5L16.2 6.4L17.6 7.8Z" fill="#1D1B20"/>
+                                            </svg>
+                                        </div>
+                                        <div role='button' class="col-1 delete-link" data-email="<%= row.email %>">
+                                            <svg width="22" height="24" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2 6H4M4 6H20M4 6V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H16C16.5304 22 17.0391 21.7893 17.4142 21.4142C17.7893 21.0391 18 20.5304 18 20V6M7 6V4C7 3.46957 7.21071 2.96086 7.58579 2.58579C7.96086 2.21071 8.46957 2 9 2H13C13.5304 2 14.0391 2.21071 14.4142 2.58579C14.7893 2.96086 15 3.46957 15 4V6M9 11V17M13 11V17" stroke="#EC221F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown-content">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %> 
+                </table>
+                    </div>
+                </section>
+
+                <!-- Data Usage Section (Placeholder) -->
+                <section id="data-usage-section" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3><i class="fas fa-chart-bar me-2 text-success"></i> Data Usage</h3>
+                        <button class="btn btn-info text-white">
+                            <i class="fas fa-download me-2"></i> Export
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="groups" class=" table table-hover">
+                            <tr>
+                                <th>Email</th>
+                                <th>Upload</th>
+                                <th>Download</th>
+                                <th>Action</th>
+                            </tr>
+                        <% dataUsage.forEach((row, index) => { %>
+                            <tr>
+                                <td><%= row.Email %></td>
+                                <td><%= row.Upload %></td>
+                                <td><%= row.Download %></td>
+                                <td>
+                                        <div class="row justify-content-evenly">
+                                            <div role='button' class="col-1 dropdown">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M3 21V16.75L16.2 3.575C16.4 3.39167 16.6208 3.25 16.8625 3.15C17.1042 3.05 17.3583 3 17.625 3C17.8917 3 18.15 3.05 18.4 3.15C18.65 3.25 18.8667 3.4 19.05 3.6L20.425 5C20.625 5.18333 20.7708 5.4 20.8625 5.65C20.9542 5.9 21 6.15 21 6.4C21 6.66667 20.9542 6.92083 20.8625 7.1625C20.7708 7.40417 20.625 7.625 20.425 7.825L7.25 21H3ZM17.6 7.8L19 6.4L17.6 5L16.2 6.4L17.6 7.8Z" fill="#1D1B20"/>
+                                                </svg>
+                                            </div>
+                                            <div role='button' class="col-1 delete-link" data-email="<%= row.email %>">
+                                                <svg width="22" height="24" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M2 6H4M4 6H20M4 6V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H16C16.5304 22 17.0391 21.7893 17.4142 21.4142C17.7893 21.0391 18 20.5304 18 20V6M7 6V4C7 3.46957 7.21071 2.96086 7.58579 2.58579C7.96086 2.21071 8.46957 2 9 2H13C13.5304 2 14.0391 2.21071 14.4142 2.58579C14.7893 2.96086 15 3.46957 15 4V6M9 11V17M13 11V17" stroke="#EC221F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="dropdown-content">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %> 
+                        </table>                
+                    </div>
+                    
+                </section>
+
+                <!-- All Data Section (Placeholder) -->
+                <section id="groups-section" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3><i class="fas fa-users me-2 text-info"></i> User Groups</h3>
+                        <button class="btn btn-info text-white">
+                            <i class="fas fa-download me-2"></i> Export
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="groups" class=" table table-hover">
+                        <tr>
+                            <th>Full name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
                     <% groups.forEach((row, index) => { %>
                         <tr>
                             <td><%= row.fullName %></td>
@@ -153,27 +240,44 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3><i class="fas fa-chart-bar me-2 text-success"></i> Data Usage</h3>
                         <button class="btn btn-success">
-                            <i class="fas fa-download me-2"></i> Export Data
-                        </button>
+                            <i class="fas fa-download me-2"></i> Export
+                        </button> 
                     </div>
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i> 
-                        Data usage statistics will be displayed here once configured.
+                    <div class="table-responsive">
+                        <table id="groups" class=" table table-hover">
+                        <tr>
+                            <th>Full name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    <% groups.forEach((row, index) => { %>
+                        <tr>
+                            <td><%= row.fullName %></td>
+                            <td><%= row.email %></td>
+                            <td><%= row.GroupName %></td>
+                            <td>
+                                    <div class="row justify-content-evenly">
+                                        <div role='button' class="col-1 dropdown">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 21V16.75L16.2 3.575C16.4 3.39167 16.6208 3.25 16.8625 3.15C17.1042 3.05 17.3583 3 17.625 3C17.8917 3 18.15 3.05 18.4 3.15C18.65 3.25 18.8667 3.4 19.05 3.6L20.425 5C20.625 5.18333 20.7708 5.4 20.8625 5.65C20.9542 5.9 21 6.15 21 6.4C21 6.66667 20.9542 6.92083 20.8625 7.1625C20.7708 7.40417 20.625 7.625 20.425 7.825L7.25 21H3ZM17.6 7.8L19 6.4L17.6 5L16.2 6.4L17.6 7.8Z" fill="#1D1B20"/>
+                                            </svg>
+                                        </div>
+                                        <div role='button' class="col-1 delete-link" data-email="<%= row.email %>">
+                                            <svg width="22" height="24" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2 6H4M4 6H20M4 6V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H16C16.5304 22 17.0391 21.7893 17.4142 21.4142C17.7893 21.0391 18 20.5304 18 20V6M7 6V4C7 3.46957 7.21071 2.96086 7.58579 2.58579C7.96086 2.21071 8.46957 2 9 2H13C13.5304 2 14.0391 2.21071 14.4142 2.58579C14.7893 2.96086 15 3.46957 15 4V6M9 11V17M13 11V17" stroke="#EC221F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown-content">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %> 
+                </table>
                     </div>
-                </section>
-
-                <!-- All Data Section (Placeholder) -->
-                <section id="all-data-section" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3><i class="fas fa-database me-2 text-warning"></i> All Data</h3>
-                        <button class="btn btn-warning text-white">
-                            <i class="fas fa-sync me-2"></i> Refresh Data
-                        </button>
-                    </div>
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i> 
-                        Complete data set will be available here once configured.
-                    </div>
+                    
                 </section>
             </main>
         </div>

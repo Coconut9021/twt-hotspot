@@ -118,6 +118,7 @@ export async function insertUserData(data) {
             VALUES (?, 'user', 0)
         `, [data.email]);
 
+
         return { success: true };
     } catch (error) {
         console.error('Error inserting user data:', error);
@@ -152,8 +153,12 @@ export async function showDatabase() {
             FROM radusergroup rg
             LEFT JOIN users up ON rg.UserName = up.email
         `);
+
+        const [dataUsage] = await pool.query(`
+            SELECT username, acctinputoctets, acctoutputoctets FROM radacct 
+            `);
         
-        return { fullData, groups };
+        return { fullData, groups, dataUsage };
     } catch (error) {
         console.error('Database error:', error);
         throw error;

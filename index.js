@@ -93,10 +93,11 @@ app.post("/admin", async (req, res) => {
 // Add this GET route for the dashboard
 app.get("/admin/dashboard", async (req, res) => {
     try {
-        const { fullData, groups } = await showDatabase();
+        const { fullData, groups, dataUsage } = await showDatabase();
         res.render("dashboard.ejs", {
             fullData,
-            groups
+            groups,
+            dataUsage
         });
     } catch (error) {
         console.error('Error loading admin page:', error);
