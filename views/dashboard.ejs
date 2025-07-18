@@ -158,6 +158,7 @@
                         <table id="groups" class=" table table-hover">
                             <tr>
                                 <th>Email</th>
+                                <th>IP Address</th>
                                 <th>Upload</th>
                                 <th>Download</th>
                                 <th>Action</th>
@@ -165,6 +166,7 @@
                         <% dataUsage.forEach((row, index) => { %>
                             <tr>
                                 <td><%= row.username %></td>
+                                <td><%= row.framedipaddress %></td>
                                 <td><%= row.acctinputoctets %></td>
                                 <td><%= row.acctoutputoctets %></td>
                                 <td>
