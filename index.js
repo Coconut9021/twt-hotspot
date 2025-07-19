@@ -78,14 +78,20 @@ app.post("/admin", async (req, res) => {
 
         if (isAuthenticated) {
             const user = { name: username };
-            const accessToken = jwt.sign(user, process.env.USER_ACCESS_TOKEN)
+            const accessToken = jwt.sign(user, process.env.USER_ACCESS_TOKEN);
 
-            // Set token as HTTP-only cookie
+            // More flexible cookie settings for server deployment
             res.cookie('token', accessToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+                secure: false, // Set to false for testing, true for production HTTPS
+                sameSite: 'lax', // More permissive for development
+                maxAge: 24 * 60 * 60 * 1000, // 24 hours
+                path: '/' // Ensure cookie is available for all paths
             });
+
+            // Also log the token creation for debugging
+            console.log('Token created for user:', username);
+            console.log('Token set as cookie');
 
             return res.json({
                 success: true,
@@ -98,33 +104,77 @@ app.post("/admin", async (req, res) => {
             error: "Invalid credentials"
         });
     } catch (error) {
-        console.error(error);
+        console.error('Admin login error:', error);
         res.status(500).json({
             success: false,
             error: 'Server error'
         });
     }
 });
+// Add this debug middleware to your index.js BEFORE the authenticateToken middleware
 
-// Add this GET route for the dashboard
-app.get("/admin/dashboard", authenticateToken, async (req, res) => {
-    try {
-        // Verify admin role
-        const isAdmin = await checkAdmin(req.user.name);
-        if (!isAdmin) {
-            return res.status(403).send('Forbidden');
-        }
+// Debug middleware - add this temporarily
+app.use('/admin/dashboard', (req, res, next) => {
+    console.log('=== DEBUG INFO ===');
+    console.log('Headers:', req.headers);
+    console.log('Cookies:', req.cookies);
+    console.log('Token from cookie:', req.cookies.token);
+    console.log('USER_ACCESS_TOKEN env var exists:', !!process.env.USER_ACCESS_TOKEN);
+    console.log('USER_ACCESS_TOKEN length:', process.env.USER_ACCESS_TOKEN?.length);
+    console.log('==================');
+    next();
+});
 
-        const { fullData, groups, dataUsage } = await showDatabase();
-        res.render("dashboard.ejs", {
-            fullData,
-            groups,
-            dataUsage
-        });
-    } catch (error) {
-        console.error('Error loading admin page:', error);
-        res.status(500).send('Server Error');
+// Updated authenticateToken with better logging
+export function authenticateToken(req, res, next) {
+    console.log('=== TOKEN AUTH DEBUG ===');
+    
+    // Check Authorization header first
+    const authHeader = req.headers['authorization'];
+    let token = authHeader && authHeader.split(' ')[1];
+    console.log('Token from header:', token ? 'EXISTS' : 'NONE');
+    
+    // If no header token, check cookies
+    if (!token) {
+        token = req.cookies.token;
+        console.log('Token from cookie:', token ? 'EXISTS' : 'NONE');
     }
+
+    if (!token) {
+        console.log('No token found - returning 401');
+        return res.sendStatus(401);
+    }
+    
+    console.log('JWT Secret exists:', !!process.env.USER_ACCESS_TOKEN);
+    
+    jwt.verify(token, process.env.USER_ACCESS_TOKEN, (err, user) => {
+        if (err) {
+            console.log('JWT verification failed:', err.message);
+            return res.sendStatus(403);
+        }
+        console.log('JWT verification successful for user:', user);
+        req.user = user;
+        next();
+    });
+    
+    console.log('======================');
+}
+
+app.get("/test-cookies", (req, res) => {
+    res.json({
+        cookies: req.cookies,
+        headers: req.headers,
+        hasToken: !!req.cookies.token
+    });
+});
+
+// Add this route to manually set a test cookie
+app.get("/set-test-cookie", (req, res) => {
+    res.cookie('testCookie', 'testValue', {
+        httpOnly: true,
+        maxAge: 60000 // 1 minute
+    });
+    res.json({ message: 'Test cookie set' });
 });
 
 app.post("/registered", (req, res) => {
