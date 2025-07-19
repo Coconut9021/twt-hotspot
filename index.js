@@ -107,7 +107,7 @@ app.post("/admin", async (req, res) => {
 });
 
 // Add this GET route for the dashboard
-app.get("/admin/dashboard", authenticateToken, async (req, res) => {
+app.post("/admin/dashboard", authenticateToken, async (req, res) => {
     try {
         // Verify admin role
         const isAdmin = await checkAdmin(req.user.name);
