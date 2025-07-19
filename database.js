@@ -2,7 +2,11 @@ import mysql from 'mysql2/promise';
 import dotenv from 'dotenv' 
 import dgram from 'dgram';
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import cookieParser from 'cookie-parser';
+
 import { cleanPhoneNumber, scrubCompany } from './utils.js'
+import { verify } from 'crypto';
 
 dotenv.config();
 
@@ -89,6 +93,27 @@ export async function authenticateAdmin(username, password) {
         console.error("Error authenticating the role of users:", error.message);
         throw error;
     }
+}
+
+export function authenticateToken(req, res, next) {
+    // Check Authorization header first
+    const authHeader = req.headers['authorization'];
+    let token = authHeader && authHeader.split(' ')[1];
+    
+    // If no header token, check cookies
+    if (!token) {
+        token = req.cookies.token;
+    }
+
+    if (!token) {
+        return res.sendStatus(401);
+    }
+    
+    jwt.verify(token, process.env.USER_ACCESS_TOKEN, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
 }
 
 export async function insertUserData(data) {

@@ -15,3 +15,7 @@ export function scrubCompany(company) {
     if (!company || company.trim() === '') return null;
     return company.trim(); // Return the cleaned company name
 }
+
+function octetsToMB(octets) {
+    return (octets / (1024 * 1024)).toFixed(2);
+}

@@ -1,8 +1,12 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
+
 
 import pool, { 
     authenticateUser, 
     authenticateAdmin,
+    authenticateToken,
     insertUserData, 
     deleteUser,
     showDatabase,
@@ -14,6 +18,7 @@ const app = express();
 
 app.use(express.static("public"));
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -37,8 +42,9 @@ app.post("/login", async (req, res) => {
     }
 });
 
-app.post("/logout", async (req, res) => {
-    
+app.post("/logout", (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/admin');
 });
 
 app.post("/alogin", (req, res) => {
@@ -71,6 +77,16 @@ app.post("/admin", async (req, res) => {
         const isAuthenticated = await authenticateAdmin(username, password);
 
         if (isAuthenticated) {
+            const user = { name: username };
+            const accessToken = jwt.sign(user, process.env.USER_ACCESS_TOKEN)
+
+            // Set token as HTTP-only cookie
+            res.cookie('token', accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            });
+
             return res.json({
                 success: true,
                 redirect: '/admin/dashboard'
@@ -91,8 +107,14 @@ app.post("/admin", async (req, res) => {
 });
 
 // Add this GET route for the dashboard
-app.get("/admin/dashboard", async (req, res) => {
+app.get("/admin/dashboard", authenticateToken, async (req, res) => {
     try {
+        // Verify admin role
+        const isAdmin = await checkAdmin(req.user.name);
+        if (!isAdmin) {
+            return res.status(403).send('Forbidden');
+        }
+
         const { fullData, groups, dataUsage } = await showDatabase();
         res.render("dashboard.ejs", {
             fullData,
